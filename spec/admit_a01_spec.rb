@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'health_seven'
-describe PatientAdministration do
+describe 'PatientAdministration' do
   include HL7SpecHelper
 
   let(:config) { nil }

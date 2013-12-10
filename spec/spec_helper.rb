@@ -1,4 +1,3 @@
-
 module HL7SpecHelper
   def fixture(name)
     path = File.dirname(__FILE__) + "/fixtures/#{name}.hl7"
