@@ -249,6 +249,7 @@ describe 'PatientAdministration' do
   end
 
   example do
+    puts pv1.assigned_patient_location.to_yaml#, Pl, position: "PV1.3"
     puts pv1.prior_patient_location.to_yaml#, Pl, position: "PV1.6"
     puts pv1.temporary_location.to_yaml#, Pl, position: "PV1.11"
     puts pv1.pending_location.to_yaml#, Pl, position: "PV1.42"
@@ -301,8 +302,6 @@ end
 =begin
 # Set ID - PV1
 attribute :set_id_pv1, Si, position: "PV1.1"
-# Assigned Patient Location
-attribute :assigned_patient_location, Pl, position: "PV1.3"
 # Prior Patient Location
 attribute :prior_patient_location, Pl, position: "PV1.6"
 # Attending Doctor
