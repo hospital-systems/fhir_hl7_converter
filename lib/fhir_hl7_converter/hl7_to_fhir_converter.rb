@@ -2,6 +2,7 @@ module FhirHl7Converter
   class Hl7ToFhirConverter
     def initialize(hl7)
       @hl7 = hl7
+      @terrminology = Terrminology.api
     end
 
     def patient
@@ -586,6 +587,7 @@ end
       {'01' => 'home'}[discharge_disposition]
     end
 
+    #"http://hl7.org/fhir/vs/encounter-discharge-disposition"
     def discharge_disposition_to_display(discharge_disposition)
       {'home' => 'Home',
        'other-hcf' => 'Other healthcare facility',
@@ -607,6 +609,7 @@ end
       }[address_type]
     end
 
+    #"http://hl7.org/fhir/vs/administrative-gender"
     def gender_code_to_display(code)
       {
           'F' => 'Female',
@@ -615,6 +618,7 @@ end
       }[code]
     end
 
+    #"http://hl7.org/fhir/vs/marital-status"
     def marital_status_code_to_display(code)
       {
           'U' => 'unmarried',
@@ -630,6 +634,7 @@ end
       }[code]
     end
 
+    #"http://hl7.org/fhir/v2/vs/0007"
     def admission_type_code_to_display(admission_type)
       {
           'A' => 'Accident',
@@ -646,6 +651,7 @@ end
       vip_indicator
     end
 
+    #"http://hl7.org/fhir/vs/encounter-special-courtesy"
     def vip_indicator_to_display(vip_indicator)
       {'EXT' => 'extended courtesy',
        'NRM' => 'normal courtesy',
@@ -660,16 +666,10 @@ end
     end
 
     def admit_source_to_display(admit_source)
-      {'hosp-trans' => 'Transferred from other hospitalHospice',
-       'emd' => 'From accident/emergency department',
-       'outp' => 'From outpatient department',
-       'born' => 'Born in hospitalHospice',
-       'gp' => 'General Practitioner referral',
-       'mp' => 'Medical Practitioner/physician referral',
-       'nursing' => 'From nursing home',
-       'psych' => 'From psychiatric hospitalHospice',
-       'rehab' => 'From rehabilitation facility',
-       'other' => 'Other'}[admit_source_to_code(admit_source)]
+      @terrminology.coding(
+          'http://hl7.org/fhir/vs/encounter-admit-source',
+           admit_source_to_code(admit_source)
+      ).display
     end
   end
 end
