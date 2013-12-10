@@ -249,7 +249,14 @@ describe 'PatientAdministration' do
   end
 
   example do
-    puts pv1.assigned_patient_location.to_yaml#, Pl, position: "PV1.3"
+    pv1.assigned_patient_location.tap do |l|
+      puts l.point_of_care.to_p
+      puts l.room.to_p
+      puts l.bed.to_p
+      l.facility.tap do |f|
+        puts f.namespace_id.to_p
+      end
+    end
     puts pv1.prior_patient_location.to_yaml#, Pl, position: "PV1.6"
     puts pv1.temporary_location.to_yaml#, Pl, position: "PV1.11"
     puts pv1.pending_location.to_yaml#, Pl, position: "PV1.42"
