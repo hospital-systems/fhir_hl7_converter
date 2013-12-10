@@ -453,17 +453,17 @@ module FhirHl7Converter
 
     def hl7_to_fhir_hospitalization(hl7)
       Fhir::Encounter::Hospitalization.new(
-          pre_admission_identifier: pv1_to_fhir_pre_admission_identifier(pv1),
+          pre_admission_identifier: pv1_to_fhir_pre_admission_identifier(hl7.pv1),
           origin: nil,#Fhir::Location,
-          admit_source: pv1_to_admit_source(pv1),
+          admit_source: pv1_to_admit_source(hl7.pv1),
           period: hl7_to_fhir_period(hl7),
-          accomodations: pv1_to_fhir_accomodations(pv1),
-          diet: pv1_to_diet(pv1),
-          special_courtesies: pv1_to_fhir_special_courtesies(pv1),
+          accomodations: pv1_to_fhir_accomodations(hl7.pv1),
+          diet: pv1_to_diet(hl7.pv1),
+          special_courtesies: pv1_to_fhir_special_courtesies(hl7.pv1),
           special_arrangements: pv1_to_fhir_special_arrangements(hl7),
           destination: nil,#Fhir::Location,
-          discharge_disposition: pv1_to_discharge_disposition(pv1),
-          re_admission: pv1_to_fhir_re_admission(pv1)
+          discharge_disposition: pv1_to_discharge_disposition(hl7.pv1),
+          re_admission: pv1_to_fhir_re_admission(hl7.pv1)
       )
     end
 
@@ -549,7 +549,7 @@ module FhirHl7Converter
 
     def hl7_to_fhir_locations(hl7)
       Fhir::Encounter::Location.new(
-          location: pv1_to_fhir_location(pv1),
+          location: pv1_to_fhir_location(hl7.pv1),
           period: nil#Fhir::Period
       )
     end
