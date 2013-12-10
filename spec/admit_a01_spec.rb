@@ -249,6 +249,55 @@ describe 'PatientAdministration' do
   end
 
   example do
+    puts pv1.prior_patient_location.to_yaml#, Pl, position: "PV1.6"
+    puts pv1.temporary_location.to_yaml#, Pl, position: "PV1.11"
+    puts pv1.pending_location.to_yaml#, Pl, position: "PV1.42"
+    puts pv1.prior_temporary_location.to_yaml#, Pl, position: "PV1.43"
+    gateway.pv1_to_fhir_location(pv1).tap do |l|
+      l.text#, Fhir::Narrative
+      l.name#, String
+      l.description#, String
+      l.types#, Array[Fhir::CodeableConcept]
+      l.telecom#, Fhir::Contact
+      l.address#, Fhir::Address
+      l.position.tap do |p|#, Position
+        p.longitude#, Float
+        p.latitude#, Float
+        p.altitude#, Float
+      end
+      l.provider#, [Fhir::Organization]
+      l.active#, Boolean
+      l.part_of#, [Fhir::Location]
+    end
+=begin
+class Pl < ::HealthSeven::DataType
+  # Point of Care
+  attribute :point_of_care, Is, position: "PL.1"
+  # Room
+  attribute :room, Is, position: "PL.2"
+  # Bed
+  attribute :bed, Is, position: "PL.3"
+  # Facility
+  attribute :facility, Hd, position: "PL.4"
+  # Location Status
+  attribute :location_status, Is, position: "PL.5"
+  # Person Location Type
+  attribute :person_location_type, Is, position: "PL.6"
+  # Building
+  attribute :building, Is, position: "PL.7"
+  # Floor
+  attribute :floor, Is, position: "PL.8"
+  # Location Description
+  attribute :location_description, St, position: "PL.9"
+  # Comprehensive Location Identifier
+  attribute :comprehensive_location_identifier, Ei, position: "PL.10"
+  # Assigning Authority for Location
+  attribute :assigning_authority_for_location, Hd, position: "PL.11"
+end
+    end
+  end
+
+  example do
 =begin
 # Set ID - PV1
 attribute :set_id_pv1, Si, position: "PV1.1"

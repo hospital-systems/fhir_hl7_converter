@@ -548,14 +548,33 @@ module FhirHl7Converter
     end
 
     def hl7_to_fhir_locations(hl7)
-      Fhir::Encounter::Location.new(
-          location: pv1_to_fhir_location(pv1),
-          period: nil#Fhir::Period
-      )
+      [Fhir::Encounter::Location.new(
+        location: pv1_to_fhir_location(hl7.pv1),
+        period: Fhir::Period.new(start: DateTime.now, end: DateTime.now)
+      )]
     end
 
     def pv1_to_fhir_location(pv1)
       #Fhir::Location,PV1-3-assigned patient location / PV1-6-prior patient location / PV1-11-temporary location / PV1-42-pending location / PV1-43-prior temporary location
+=begin
+class Fhir::Location < Fhir::Resource
+  attribute :text, Fhir::Narrative
+  attribute :name, String
+  attribute :description, String
+  attribute :types, Array[Fhir::CodeableConcept]
+  attribute :telecom, Fhir::Contact
+  attribute :address, Fhir::Address
+  class Position < Fhir::ValueObject
+    attribute :longitude, Float
+    attribute :latitude, Float
+    attribute :altitude, Float
+  end
+  attribute :position, Position
+  resource_reference :provider, [Fhir::Organization]
+  attribute :active, Boolean
+  resource_reference :part_of, [Fhir::Location]
+end
+=end
     end
 
     def hl7_to_fhir_service_provider(hl7)
