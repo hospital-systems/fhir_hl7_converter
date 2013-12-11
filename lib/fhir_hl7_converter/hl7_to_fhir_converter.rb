@@ -194,15 +194,14 @@ module FhirHl7Converter
     end
 
     def administrative_sex_to_gender(administrative_sex)
-      sex = administrative_sex.try(:to_p)
+      sex    = administrative_sex.try(:to_p)
+      coding = @terrminology.coding(
+          'http://hl7.org/fhir/vs/administrative-gender',
+          sex
+      )
       sex && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(
-                        system: 'http://hl7.org/fhir/v3/vs/AdministrativeGender',
-                        code: sex,
-                        display: gender_code_to_display(sex)
-                    )
-          ],
-          text: gender_code_to_display(sex) || sex
+          codings: [Fhir::Coding.new(coding)],
+          text:    coding[:display] || sex
       )
     end
 
@@ -249,14 +248,13 @@ module FhirHl7Converter
 
     def pid_to_fhir_marital_status(pid)
       marital_status = pid.marital_status.try(:identifier).try(:to_p)
+      coding         = @terrminology.coding(
+          'http://hl7.org/fhir/vs/marital-status',
+          marital_status
+      )
       marital_status && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(
-                        system: 'http://hl7.org/fhir/vs/marital-status',
-                        code: marital_status,
-                        display: marital_status_code_to_display(marital_status),
-                    )
-          ],
-          text: marital_status_code_to_display(marital_status)
+          codings: [Fhir::Coding.new(coding)],
+          text:    coding[:display]
       )
     end
 
@@ -413,15 +411,14 @@ module FhirHl7Converter
 
     def pv1_to_fhir_types(pv1)
       admission_type = pv1.admission_type.try(:to_p)
+      coding         = @terrminology.coding(
+          'http://hl7.org/fhir/v2/vs/0007',
+          admission_type
+      )
       admission_type && [
           Fhir::CodeableConcept.new(
-              codings: [Fhir::Coding.new(
-                            system: 'http://hl7.org/fhir/v2/vs/0007',
-                            code: admission_type,
-                            display: admission_type_code_to_display(admission_type)
-                        )
-              ],
-              text: admission_type_code_to_display(admission_type) || admission_type
+              codings: [Fhir::Coding.new(coding)],
+              text:    coding[:display] || admission_type
           )]
     end
 
@@ -475,14 +472,13 @@ module FhirHl7Converter
     def pv1_to_admit_source(pv1)
       #Fhir::CodeableConcept,PV1-14-admit source
       admit_source = pv1.admit_source.try(:to_p)
+      coding       = @terrminology.coding(
+          'http://hl7.org/fhir/vs/encounter-admit-source',
+          admit_source_to_code(admit_source)
+      )
       admit_source && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(
-                        system: 'http://hl7.org/fhir/admit-source',
-                        code: admit_source_to_code(admit_source),
-                        display: admit_source_to_display(admit_source)
-                    )
-          ],
-          text: admit_source_to_display(admit_source) || admit_source
+          codings: [Fhir::Coding.new(coding)],
+          text:    coding[:display] || admit_source
       )
     end
 
@@ -520,12 +516,14 @@ module FhirHl7Converter
     def pv1_to_fhir_special_courtesies(pv1)
       #Array[Fhir::CodeableConcept],PV1-16-VIP indicator
       vip_indicator = pv1.vip_indicator.try(:to_p)
+      code          = vip_indicator_to_code(vip_indicator)
+      coding        = @terrminology.coding(
+          'http://hl7.org/fhir/vs/encounter-special-courtesy',
+          admit_source_to_code(code)
+      )
       vip_indicator && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(
-                        system: 'http://hl7.org/fhir/vs/encounter-special-courtesy',
-                        code: vip_indicator_to_code(vip_indicator),
-                        display: vip_indicator_to_display(vip_indicator))],
-          text: vip_indicator_to_display(vip_indicator))
+          codings: [Fhir::Coding.new(coding)],
+          text:    coding[:display])
     end
 
     def pv1_to_fhir_special_arrangements(hl7)
@@ -534,12 +532,13 @@ module FhirHl7Converter
 
     def pv1_to_discharge_disposition(pv1)
       discharge_disposition = pv1.discharge_disposition.try(:to_p)
+      coding                = @terrminology.coding(
+          'http://hl7.org/fhir/vs/encounter-discharge-disposition',
+          discharge_disposition_to_code(discharge_disposition)
+      )
       discharge_disposition && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(
-                        system: 'http://hl7.org/fhir/discharge-disposition',
-                        code: discharge_disposition_to_code(discharge_disposition),
-                        display: discharge_disposition_to_display(discharge_disposition))],
-          text: discharge_disposition_to_display(discharge_disposition))
+          codings: [Fhir::Coding.new(coding)],
+          text:    coding[:display])
 
       #Fhir::CodeableConcept,PV1-36-discharge disposition
     end
@@ -587,13 +586,6 @@ end
       {'01' => 'home'}[discharge_disposition]
     end
 
-    def discharge_disposition_to_display(discharge_disposition)
-      @terrminology.coding(
-          'http://hl7.org/fhir/vs/encounter-discharge-disposition',
-          discharge_disposition_to_code(discharge_disposition)
-      )[:display]
-    end
-
     def address_type_to_use(address_type)
       {
           'H' => 'home',
@@ -603,48 +595,13 @@ end
       }[address_type]
     end
 
-    def gender_code_to_display(code)
-      @terrminology.coding(
-          'http://hl7.org/fhir/vs/administrative-gender',
-          code
-      )[:display]
-    end
-
-    def marital_status_code_to_display(code)
-      @terrminology.coding(
-          'http://hl7.org/fhir/vs/marital-status',
-          code
-      )[:display]
-    end
-
-    def admission_type_code_to_display(admission_type)
-      @terrminology.coding(
-          'http://hl7.org/fhir/v2/vs/0007',
-          admission_type
-      )[:display]
-    end
-
     def vip_indicator_to_code(vip_indicator)
       vip_indicator
-    end
-
-    def vip_indicator_to_display(vip_indicator)
-      @terrminology.coding(
-          'http://hl7.org/fhir/vs/encounter-special-courtesy',
-          admit_source_to_code(vip_indicator_to_code(vip_indicator))
-      )[:display]
     end
 
     def admit_source_to_code(admit_source)
       #!!! Incomplete
       {'7' => 'emd'}[admit_source]
-    end
-
-    def admit_source_to_display(admit_source)
-      @terrminology.coding(
-          'http://hl7.org/fhir/vs/encounter-admit-source',
-           admit_source_to_code(admit_source)
-      )[:display]
     end
   end
 end
