@@ -591,7 +591,7 @@ end
       @terrminology.coding(
           'http://hl7.org/fhir/vs/encounter-discharge-disposition',
           discharge_disposition_to_code(discharge_disposition)
-      ).display
+      )[:display]
     end
 
     def address_type_to_use(address_type)
@@ -607,21 +607,21 @@ end
       @terrminology.coding(
           'http://hl7.org/fhir/vs/administrative-gender',
           code
-      ).display
+      )[:display]
     end
 
     def marital_status_code_to_display(code)
       @terrminology.coding(
           'http://hl7.org/fhir/vs/marital-status',
           code
-      ).display
+      )[:display]
     end
 
     def admission_type_code_to_display(admission_type)
       @terrminology.coding(
           'http://hl7.org/fhir/v2/vs/0007',
           admission_type
-      ).display
+      )[:display]
     end
 
     def vip_indicator_to_code(vip_indicator)
@@ -632,7 +632,7 @@ end
       @terrminology.coding(
           'http://hl7.org/fhir/vs/encounter-special-courtesy',
           admit_source_to_code(vip_indicator_to_code(vip_indicator))
-      ).display
+      )[:display]
     end
 
     def admit_source_to_code(admit_source)
@@ -644,7 +644,7 @@ end
       @terrminology.coding(
           'http://hl7.org/fhir/vs/encounter-admit-source',
            admit_source_to_code(admit_source)
-      ).display
+      )[:display]
     end
   end
 end
