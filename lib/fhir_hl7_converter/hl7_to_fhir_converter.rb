@@ -587,17 +587,11 @@ end
       {'01' => 'home'}[discharge_disposition]
     end
 
-    #"http://hl7.org/fhir/vs/encounter-discharge-disposition"
     def discharge_disposition_to_display(discharge_disposition)
-      {'home' => 'Home',
-       'other-hcf' => 'Other healthcare facility',
-       'hosp' => 'Hospice',
-       'long' => 'Long-term care',
-       'aadvice' => 'Left against advice',
-       'exp' => 'Expired',
-       'psy' => 'Psychiatric hospitalHospice',
-       'rehab' => 'Rehabilitation',
-       'oth' => 'Other'}[discharge_disposition_to_code(discharge_disposition)]
+      @terrminology.coding(
+          'http://hl7.org/fhir/vs/encounter-discharge-disposition',
+          discharge_disposition_to_code(discharge_disposition)
+      ).display
     end
 
     def address_type_to_use(address_type)
@@ -609,55 +603,36 @@ end
       }[address_type]
     end
 
-    #"http://hl7.org/fhir/vs/administrative-gender"
     def gender_code_to_display(code)
-      {
-          'F' => 'Female',
-          'M' => 'Male',
-          'UN' => 'Undifferentiated'
-      }[code]
+      @terrminology.coding(
+          'http://hl7.org/fhir/vs/administrative-gender',
+          code
+      ).display
     end
 
-    #"http://hl7.org/fhir/vs/marital-status"
     def marital_status_code_to_display(code)
-      {
-          'U' => 'unmarried',
-          'A' => 'Annulled',
-          'D' => 'Divorced',
-          'I' => 'Interlocutory',
-          'L' => 'Legally Separated',
-          'M' => 'Married',
-          'P' => 'Polygamous',
-          'S' => 'Never Married',
-          'T' => 'Domestic partner',
-          'W' => 'Widowed'
-      }[code]
+      @terrminology.coding(
+          'http://hl7.org/fhir/vs/marital-status',
+          code
+      ).display
     end
 
-    #"http://hl7.org/fhir/v2/vs/0007"
     def admission_type_code_to_display(admission_type)
-      {
-          'A' => 'Accident',
-          'C' => 'Elective',
-          'E' => 'Emergency',
-          'L' => 'Labor and Delivery',
-          'N' => 'Newborn (Birth in healthcare facility)',
-          'R' => 'Routine',
-          'U' => 'Urgent'
-      }[admission_type]
+      @terrminology.coding(
+          'http://hl7.org/fhir/v2/vs/0007',
+          admission_type
+      ).display
     end
 
     def vip_indicator_to_code(vip_indicator)
       vip_indicator
     end
 
-    #"http://hl7.org/fhir/vs/encounter-special-courtesy"
     def vip_indicator_to_display(vip_indicator)
-      {'EXT' => 'extended courtesy',
-       'NRM' => 'normal courtesy',
-       'PRF' => 'professional courtesy',
-       'STF' => 'staffCourtesies extended to the staff of the entity providing service.',
-       'VIP' => 'very important perso'}[vip_indicator_to_code(vip_indicator)]
+      @terrminology.coding(
+          'http://hl7.org/fhir/vs/encounter-special-courtesy',
+          admit_source_to_code(vip_indicator_to_code(vip_indicator))
+      ).display
     end
 
     def admit_source_to_code(admit_source)
