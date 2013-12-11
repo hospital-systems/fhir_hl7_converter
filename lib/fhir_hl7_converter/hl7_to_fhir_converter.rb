@@ -1,5 +1,7 @@
 module FhirHl7Converter
   class Hl7ToFhirConverter
+    attr_reader :terrminology
+
     def initialize(hl7)
       @hl7 = hl7
       @terrminology = Terrminology.api

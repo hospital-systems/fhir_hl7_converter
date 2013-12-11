@@ -11,6 +11,11 @@ describe 'PatientAdministration' do
   let(:pid) { hl7.pid }
   let(:nk1s) { hl7.nk1s }
   let(:pv1) { hl7.pv1 }
+  let(:discharge_disposition_v_s_identifier) { 'http://hl7.org/fhir/vs/encounter-discharge-disposition' }
+  let(:admit_source_v_s_identifier)          { 'http://hl7.org/fhir/vs/encounter-admit-source' }
+  let(:administrative_sex_v_s_identifier)    { 'http://hl7.org/fhir/vs/administrative-gender' }
+  let(:marital_status_code_v_s_identifier)   { 'http://hl7.org/fhir/vs/marital-status' }
+  let(:admission_type_v_s_identifier)        { 'http://hl7.org/fhir/v2/vs/0007' }
 
   example do
     pid.patient_names.first.tap do |xpn|
@@ -51,10 +56,15 @@ describe 'PatientAdministration' do
   end
 
   example do
+    coding = gateway.terrminology.coding(
+        marital_status_code_v_s_identifier,
+        pid.marital_status.identifier.to_p)
+
     marital_status = gateway.pid_to_fhir_marital_status(pid)
-    marital_status.codings.first.code.should == pid.marital_status.identifier.to_p
-    marital_status.codings.first.display.should == gateway.marital_status_code_to_display(pid.marital_status.identifier.to_p)
-    marital_status.text.should == gateway.marital_status_code_to_display(pid.marital_status.identifier.to_p)
+
+    marital_status.codings.first.code.should    == coding[:code]
+    marital_status.codings.first.display.should == coding[:display]
+    marital_status.text.should                  == coding[:display]
   end
 
   example do
@@ -146,12 +156,18 @@ describe 'PatientAdministration' do
 
   example do
     types = gateway.pv1_to_fhir_types(pv1)
+
+    coding = gateway.terrminology.coding(
+        admission_type_v_s_identifier,
+        pv1.admission_type.to_p
+    )
+
     types.first.tap do |t|
-      t.text.should == gateway.admission_type_code_to_display(pv1.admission_type.to_p)
+      t.text.should == coding[:display]
       t.codings.first.tap do |c|
-        c.system.should == 'http://hl7.org/fhir/v2/vs/0007'
-        c.code.should == pv1.admission_type.to_p
-        c.display.should == gateway.admission_type_code_to_display(pv1.admission_type.to_p)
+        c.system.should  == coding[:system]
+        c.code.should    == coding[:code]
+        c.display.should == coding[:display]
       end
     end
   end
@@ -212,16 +228,17 @@ describe 'PatientAdministration' do
     gateway.pv1_to_discharge_disposition(pv1).tap do |discharge_disposition|
       pv1_discharge_disposition = pv1.discharge_disposition.to_p
 
-      expect(discharge_disposition.text).to eq(
-        gateway.discharge_disposition_to_display(pv1_discharge_disposition))
+      external_coding = gateway.terrminology.coding(
+          discharge_disposition_v_s_identifier,
+          gateway.discharge_disposition_to_code(pv1_discharge_disposition))
+
+      expect(discharge_disposition.text).to eq(external_coding[:display])
 
       coding = discharge_disposition.codings.first
-      expect(coding.system).to eq('http://hl7.org/fhir/discharge-disposition')
-      expect(coding.code).to eq(
-        gateway.discharge_disposition_to_code(pv1_discharge_disposition))
+      expect(coding.system).to eq(external_coding[:system])
+      expect(coding.code).to   eq(external_coding[:code])
 
-      expect(coding.display).to eq(
-        gateway.discharge_disposition_to_display(pv1_discharge_disposition))
+      expect(coding.display).to eq(external_coding[:display])
     end
   end
 
@@ -229,16 +246,18 @@ describe 'PatientAdministration' do
     gateway.pv1_to_admit_source(pv1).tap do |admit_source|
       pv1_admit_source = pv1.admit_source.to_p
 
-      expect(admit_source.text).to eq(
-        gateway.admit_source_to_display(pv1_admit_source))
+      external_coding = gateway.terrminology.coding(
+          admit_source_v_s_identifier,
+          gateway.admit_source_to_code(pv1_admit_source)
+      )
+
+      expect(admit_source.text).to eq(external_coding[:display])
 
       coding = admit_source.codings.first
-      expect(coding.system).to eq('http://hl7.org/fhir/admit-source')
-      expect(coding.code).to eq(
-        gateway.admit_source_to_code(pv1_admit_source))
+      expect(coding.system).to eq(external_coding[:system])
+      expect(coding.code).to   eq(external_coding[:code])
 
-      expect(coding.display).to eq(
-        gateway.admit_source_to_display(pv1_admit_source))
+      expect(coding.display).to eq(external_coding[:display])
     end
   end
 
@@ -440,9 +459,12 @@ attribute :consulting_doctors, Array[Xcn], position: "PV1.9", multiple: true
   end
 
   def assert_gender(gender, administrative_sex)
+    coding = gateway.terrminology.coding(
+        administrative_sex_v_s_identifier,
+        administrative_sex.to_p)
     gender.codings.first.tap do |c|
-      c.code.should == administrative_sex.to_p
-      c.display.should == gateway.gender_code_to_display(administrative_sex.to_p)
+      c.code.should    == coding[:code]
+      c.display.should == coding[:display]
     end
   end
 end
