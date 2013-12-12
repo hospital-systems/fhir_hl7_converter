@@ -91,10 +91,6 @@ module FhirHl7Converter
       HealthSeven::Message.parse(message)
     end
 
-    def hl7_to_pid(hl7)
-      hl7.pid
-    end
-
     def hl7(message)
       HealthSeven::Message.parse(message)
     end
