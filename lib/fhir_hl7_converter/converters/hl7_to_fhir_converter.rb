@@ -39,7 +39,7 @@ module FhirHl7Converter
           encounter_class:  pv1_to_fhir_class(@hl7.pv1),
           types:            pv1_to_fhir_types(@hl7.pv1),
           subject:          patient,
-          participants:     pv1_to_fhir_participants(@@hl7.pv1),
+          participants:     pv1_to_fhir_participants(@hl7.pv1),
           fulfills:         hl7_to_fhir_fulfills(@hl7),
           start:            nil,
           length:           pv1_to_fhir_length(@hl7.pv1),
@@ -47,43 +47,9 @@ module FhirHl7Converter
           indication:       nil,#Fhir::Resource,
           priority:         pv2_to_fhir_priority(@hl7.pv2),
           hospitalization:  hl7_to_fhir_hospitalization(@hl7),
-          locations:        nil, #hl7_to_fhir_locations(@hl7),
+          locations:        hl7_to_fhir_locations(@hl7),
           service_provider: hl7_to_fhir_service_provider(@hl7),
           part_of:          nil#Fhir::Encounter
-      )
-    end
-
-
-    #FIXME move to health_seven to fhir convertation gem
-    def message_to_fhir_patient(message)
-      object = FhirHl7Converter::Factory.hl7_to_fhir(message_to_hl7(message))
-
-      patient = object.patient
-
-      hl7 = message_to_hl7(message)
-      pid = hl7_to_pid(hl7)
-      obxes = hl7_to_obxes(hl7)
-      nk1s = hl7_to_nk1s(hl7)
-      lans = hl7_to_lans(hl7)
-      mrg = hl7_to_mrg(hl7)
-      Fhir::Patient.new(
-          text: pid_to_fhir_text(pid),
-          identifiers: pid_to_fhir_identifiers(pid),
-          names: pid_to_fhir_names(pid),
-          telecoms: pid_to_fhir_telecoms(pid),
-          gender: pid_to_fhir_gender(pid),
-          birth_date: pid_to_fhir_birth_date(pid),
-          deceased: pid_to_fhir_deceased(pid),
-          addresses: pid_to_fhir_addresses(pid),
-          marital_status: pid_to_fhir_marital_status(pid),
-          multiple_birth: pid_to_fhir_multiple_birth(pid),
-          photos: obxes_to_fhir_photos(obxes),
-          contacts: nk1s_to_fhir_contacts(nk1s),
-          animal: pid_to_fhir_animal(pid),
-          communications: lans_to_fhir_communications(lans),
-          provider: nil,
-          links: pid_mrg_to_fhir_links(pid, mrg),
-          active: true
       )
     end
 
@@ -131,56 +97,17 @@ module FhirHl7Converter
     end
 
     def pid_to_fhir_identifiers(pid)
-      pid.patient_identifier_lists.map{ |cx| cx_to_fhir_identifier(cx) }
-    end
-
-    def cx_to_fhir_identifier(cx)
-      Fhir::Identifier.new(
-          use: 'usual',
-          key: cx.id_number.to_p,
-          label: cx.id_number.to_p,
-          system: cx.identifier_type_code.to_p,
-          period: nil,
-          assigner: nil#[Fhir::Organization]
-      )
+      pid.patient_identifier_lists.map{ |cx| DataTypeConverter.cx_to_fhir_identifier(cx) }
     end
 
     def pid_to_fhir_names(pid)
-      pid.patient_names.map{ |xpn| xpn_to_fhir_name(xpn) } +
-          pid.patient_aliases.map{ |xpn| xpn_to_fhir_name(xpn) }
-    end
-
-    def xpn_to_fhir_name(xpn)
-      families = xpn.family_name.surname.to_p
-      givens = [
-          xpn.given_name,
-          xpn.second_and_further_given_names_or_initials_thereof
-      ].compact.map(&:to_p).select{ |n| n.present? }.join(', ')
-      prefixes = xpn.prefix.try(:to_p)
-      suffixes = xpn.suffix.try(:to_p)
-      Fhir::HumanName.new(
-          use: 'TODO',
-          text: [givens, families, prefixes, suffixes].join(' '),#FIXME
-          families: [families],
-          givens: [givens],
-          prefixes: [prefixes],
-          suffixes: [suffixes],
-          period: nil#Fhir::Period.new(start: DateTime.now, end: DateTime.now)
-      )
+      pid.patient_names.map{ |xpn| DataTypeConverter.xpn_to_fhir_name(xpn) } +
+          pid.patient_aliases.map{ |xpn| DataTypeConverter.xpn_to_fhir_name(xpn) }
     end
 
     def pid_to_fhir_telecoms(pid)
-      pid.phone_number_homes.map{ |xtn| xtn_to_fhir_telecom(xtn, 'home') } +
-          pid.phone_number_businesses.map{ |xtn| xtn_to_fhir_telecom(xtn, 'work') }
-    end
-
-    def xtn_to_fhir_telecom(xtn, use)
-      Fhir::Contact.new(
-          system: 'http://hl7.org/fhir/contact-system',
-          value: xtn.telephone_number.to_p,
-          use: use,
-          period: nil#Fhir::Period.new(start: DateTime.now, end: DateTime.now)
-      )
+      pid.phone_number_homes.map{ |xtn| DataTypeConverter.xtn_to_fhir_telecom(xtn, 'home') } +
+          pid.phone_number_businesses.map{ |xtn| DataTypeConverter.xtn_to_fhir_telecom(xtn, 'work') }
     end
 
     def pid_to_fhir_gender(pid)
@@ -214,34 +141,7 @@ module FhirHl7Converter
     end
 
     def pid_to_fhir_addresses(pid)
-      pid.patient_addresses.map{ |xad| xad_to_fhir_address(xad) }
-    end
-
-    def xad_to_fhir_address(xad)
-      Fhir::Address.new(
-          use: address_type_to_use(xad.address_type.try(:to_p)),
-          text: [
-              xad.street_address.try(:street_or_mailing_address),
-              xad.street_address.try(:street_name),
-              xad.street_address.try(:dwelling_number),
-              xad.other_designation,
-              xad.city,
-              xad.state_or_province,
-              xad.zip_or_postal_code,
-              xad.country
-          ].map(&:to_p).join(' '),
-          lines: [
-              xad.street_address.try(:street_or_mailing_address),
-              xad.street_address.try(:street_name),
-              xad.street_address.try(:dwelling_number),
-              xad.other_designation
-          ].map(&:to_p),
-          city: xad.city.to_p,
-          state: xad.state_or_province.to_p,
-          zip: xad.zip_or_postal_code.to_p,
-          country: xad.country.to_p,
-          period: nil#Fhir::Period.new(start: DateTime.now, end: DateTime.now)
-      )
+      pid.patient_addresses.map{ |xad| DataTypeConverter.xad_to_fhir_address(xad) }
     end
 
     def pid_to_fhir_marital_status(pid)
@@ -296,12 +196,12 @@ module FhirHl7Converter
                   text: [nk1.relationship.identifier.to_p, nk1.contact_role.identifier.to_p].join(' ')
               )
           ],
-          name: xpn_to_fhir_name(nk1.names.first),
+          name: DataTypeConverter.xpn_to_fhir_name(nk1.names.first),
           telecoms: (
-          nk1.phone_numbers.map{ |xtn| xtn_to_fhir_telecom(xtn, 'home') } +
-              nk1.business_phone_numbers.map{ |xtn| xtn_to_fhir_telecom(xtn, 'work') }
+          nk1.phone_numbers.map{ |xtn| DataTypeConverter.xtn_to_fhir_telecom(xtn, 'home') } +
+              nk1.business_phone_numbers.map{ |xtn| DataTypeConverter.xtn_to_fhir_telecom(xtn, 'work') }
           ),
-          address: xad_to_fhir_address(nk1.addresses.first),
+          address: DataTypeConverter.xad_to_fhir_address(nk1.addresses.first),
           gender: nk1_to_fhir_gender(nk1),
           organization: nil#, [Fhir::Organization]
       )
@@ -365,37 +265,12 @@ module FhirHl7Converter
       nil
     end
 
-    def message_to_fhir_encounter(message)
-      hl7 = message_to_hl7(message)
-      pv1 = hl7_to_pv1(hl7)
-      pv2 = hl7_to_pv2(hl7)
-      Fhir::Encounter.new(
-          text: pv1_to_fhir_text(pv1),
-          identifiers: pv1_to_fhir_identifiers(pv1),
-          status: hl7_to_fhir_status(hl7),
-          encounter_class: pv1_to_fhir_class(pv1),
-          types: pv1_to_fhir_types(pv1),
-          subject: message_to_fhir_patient(message),
-          participants: pv1_to_fhir_participants(pv1),
-          fulfills: hl7_to_fhir_fulfills(hl7),
-          start: nil,
-          length: pv1_to_fhir_length(pv1),
-          reason: hl7_to_fhir_reason(hl7),
-          indication: nil,#Fhir::Resource,
-          priority: pv2_to_fhir_priority(pv2),
-          hospitalization: hl7_to_fhir_hospitalization(hl7),
-          locations: hl7_to_fhir_locations(hl7),
-          service_provider: hl7_to_fhir_service_provider(hl7),
-          part_of: nil#Fhir::Encounter
-      )
-    end
-
     def pv1_to_fhir_text(pv1)
       #Fhir::Narrative
     end
 
     def pv1_to_fhir_identifiers(pv1)
-      [cx_to_fhir_identifier(pv1.visit_number)] if pv1.visit_number
+      [DataTypeConverter.cx_to_fhir_identifier(pv1.visit_number)] if pv1.visit_number
     end
 
     def hl7_to_fhir_status(hl7)
@@ -464,7 +339,7 @@ module FhirHl7Converter
     end
 
     def pv1_to_fhir_pre_admission_identifier(pv1)
-      cx_to_fhir_identifier(pv1.preadmit_number) if pv1.preadmit_number
+      DataTypeConverter.cx_to_fhir_identifier(pv1.preadmit_number) if pv1.preadmit_number
     end
 
     def pv1_to_admit_source(pv1)

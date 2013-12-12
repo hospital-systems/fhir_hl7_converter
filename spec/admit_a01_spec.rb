@@ -24,7 +24,7 @@ describe 'PatientAdministration' do
 
   example do
     pid.patient_names.first.tap do |xpn|
-      name = gateway.xpn_to_fhir_name(xpn)
+      name = FhirHl7Converter::DataTypeConverter.xpn_to_fhir_name(xpn)
       name.families.first.should == xpn.family_name.surname.to_p
       name.givens.first.should == [xpn.given_name, xpn.second_and_further_given_names_or_initials_thereof].map(&:to_p).join(', ')
       name.prefixes.first.should == xpn.prefix.to_p
@@ -35,14 +35,14 @@ describe 'PatientAdministration' do
 
   example do
     pid.patient_addresses.first.tap do |xad|
-      address = gateway.xad_to_fhir_address(xad)
+      address = FhirHl7Converter::DataTypeConverter.xad_to_fhir_address(xad)
       assert_address(address, xad)
     end
   end
 
   example do
     pid.patient_identifier_lists.first.tap do |cx|
-      identifier = gateway.cx_to_fhir_identifier(cx)
+      identifier = FhirHl7Converter::DataTypeConverter.cx_to_fhir_identifier(cx)
       identifier.use.should == 'usual'
       identifier.key.should == cx.id_number.to_p
       identifier.label.should == cx.id_number.to_p
@@ -74,13 +74,13 @@ describe 'PatientAdministration' do
 
   example do
     pid.phone_number_homes.first.tap do |xtn|
-      telecom = gateway.xtn_to_fhir_telecom(xtn, 'home')
+      telecom = FhirHl7Converter::DataTypeConverter.xtn_to_fhir_telecom(xtn, 'home')
       telecom.system.should == 'http://hl7.org/fhir/contact-system'
       telecom.value.should == xtn.telephone_number.to_p
       telecom.use.should == 'home'
     end
     pid.phone_number_businesses.first.tap do |xtn|
-      telecom = gateway.xtn_to_fhir_telecom(xtn, 'work')
+      telecom = FhirHl7Converter::DataTypeConverter.xtn_to_fhir_telecom(xtn, 'work')
       telecom.system.should == 'http://hl7.org/fhir/contact-system'
       telecom.value.should == xtn.telephone_number.to_p
       telecom.use.should == 'work'
@@ -145,12 +145,12 @@ describe 'PatientAdministration' do
   end
 
   example do
-    patient = gateway.message_to_fhir_patient(message)
+    patient = gateway.patient
     puts patient.to_yaml
   end
 
   example do
-    encounter = gateway.message_to_fhir_encounter(message)
+    encounter = gateway.encounter
     puts encounter.to_yaml
   end
 
