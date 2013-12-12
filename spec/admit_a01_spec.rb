@@ -17,6 +17,11 @@ describe 'PatientAdministration' do
   let(:marital_status_code_v_s_identifier)   { 'http://hl7.org/fhir/vs/marital-status' }
   let(:admission_type_v_s_identifier)        { 'http://hl7.org/fhir/v2/vs/0007' }
 
+  before(:all) do
+    gateway = FhirHl7Converter::Factory.hl7_to_fhir(HealthSeven::Message.parse(fixture('adt_a01')))
+    gateway.terrminology.initialize_data
+  end
+
   example do
     pid.patient_names.first.tap do |xpn|
       name = gateway.xpn_to_fhir_name(xpn)
