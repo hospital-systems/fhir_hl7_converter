@@ -51,12 +51,12 @@ describe 'PatientAdministration' do
   end
 
   example do
-    gender = gateway.pid_to_fhir_gender(pid)
+    gender = FhirHl7Converter::PatientAttributeConverter.pid_to_fhir_gender(pid, gateway.terrminology)
     assert_gender(gender, pid.administrative_sex)
   end
 
   example do
-    birth_date = gateway.pid_to_fhir_birth_date(pid)
+    birth_date = FhirHl7Converter::PatientAttributeConverter.pid_to_fhir_birth_date(pid)
     birth_date.should == DateTime.parse(pid.date_time_of_birth.time.to_p)
   end
 
@@ -65,7 +65,7 @@ describe 'PatientAdministration' do
         marital_status_code_v_s_identifier,
         pid.marital_status.identifier.to_p)
 
-    marital_status = gateway.pid_to_fhir_marital_status(pid)
+    marital_status = FhirHl7Converter::PatientAttributeConverter.pid_to_fhir_marital_status(pid, gateway.terrminology)
 
     marital_status.codings.first.code.should    == coding[:code]
     marital_status.codings.first.display.should == coding[:display]
@@ -88,17 +88,17 @@ describe 'PatientAdministration' do
   end
 
   example do
-    deceased = gateway.pid_to_fhir_deceased(pid)
+    deceased = FhirHl7Converter::PatientAttributeConverter.pid_to_fhir_deceased(pid)
     deceased.should == DateTime.parse(pid.patient_death_date_and_time.time.to_p)
   end
 
   example do
-    gateway.pid_to_fhir_multiple_birth(pid).should == pid.birth_order.to_p
+    FhirHl7Converter::PatientAttributeConverter.pid_to_fhir_multiple_birth(pid).should == pid.birth_order.to_p
   end
 
   example do
     nk1s.first.tap do |nk1|
-      contact = gateway.nk1_to_fhir_contact(nk1)
+      contact = FhirHl7Converter::PatientAttributeConverter.nk1_to_fhir_contact(nk1, gateway.terrminology)
       contact.relationships.first.tap do |cc|
         cc.codings.first.tap do |c|
           c.system.should == 'http://hl7.org/fhir/patient-contact-relationship'
