@@ -18,7 +18,7 @@ describe 'PatientAdministration' do
   let(:admission_type_v_s_identifier)        { 'http://hl7.org/fhir/v2/vs/0007' }
 
   before(:all) do
-    gateway = FhirHl7Converter::Factory.hl7_to_fhir(HealthSeven::Message.parse(fixture('adt_a01')))
+    #gateway = FhirHl7Converter::Factory.hl7_to_fhir(HealthSeven::Message.parse(fixture('adt_a01')))
     #gateway.terrminology.initialize_data
   end
 
