@@ -62,14 +62,14 @@ describe 'PatientAdministration' do
 
   example do
     coding = gateway.terrminology.coding(
-        marital_status_code_v_s_identifier,
-        pid.marital_status.identifier.to_p)
+      marital_status_code_v_s_identifier,
+      pid.marital_status.identifier.to_p)
 
-    marital_status = FhirHl7Converter::PatientAttributeConverter.fhir_marital_status(hl7, gateway.terrminology)
+      marital_status = FhirHl7Converter::PatientAttributeConverter.fhir_marital_status(hl7, gateway.terrminology)
 
-    marital_status.codings.first.code.should    == coding[:code]
-    marital_status.codings.first.display.should == coding[:display]
-    marital_status.text.should                  == coding[:display]
+      marital_status.codings.first.code.should    == coding[:code]
+      marital_status.codings.first.display.should == coding[:display]
+      marital_status.text.should                  == coding[:display]
   end
 
   example do
@@ -163,8 +163,8 @@ describe 'PatientAdministration' do
     types = gateway.pv1_to_fhir_types(pv1)
 
     coding = gateway.terrminology.coding(
-        admission_type_v_s_identifier,
-        pv1.admission_type.to_p
+      admission_type_v_s_identifier,
+      pv1.admission_type.to_p
     )
 
     types.first.tap do |t|
@@ -189,11 +189,11 @@ describe 'PatientAdministration' do
   example do
     pre_admission_identifier = gateway.pv1_to_fhir_pre_admission_identifier(pv1)
     expect(pre_admission_identifier.key)
-      .to eq(pv1.preadmit_number.id_number.to_p)
+    .to eq(pv1.preadmit_number.id_number.to_p)
     expect(pre_admission_identifier.label)
-      .to eq(pv1.preadmit_number.id_number.to_p)
+    .to eq(pv1.preadmit_number.id_number.to_p)
     expect(pre_admission_identifier.system)
-      .to eq(pv1.preadmit_number.identifier_type_code.to_p)
+    .to eq(pv1.preadmit_number.identifier_type_code.to_p)
   end
 
   example do
@@ -234,16 +234,16 @@ describe 'PatientAdministration' do
       pv1_discharge_disposition = pv1.discharge_disposition.to_p
 
       external_coding = gateway.terrminology.coding(
-          discharge_disposition_v_s_identifier,
-          gateway.discharge_disposition_to_code(pv1_discharge_disposition))
+        discharge_disposition_v_s_identifier,
+        gateway.discharge_disposition_to_code(pv1_discharge_disposition))
 
-      expect(discharge_disposition.text).to eq(external_coding[:display])
+        expect(discharge_disposition.text).to eq(external_coding[:display])
 
-      coding = discharge_disposition.codings.first
-      expect(coding.system).to eq(external_coding[:system])
-      expect(coding.code).to   eq(external_coding[:code])
+        coding = discharge_disposition.codings.first
+        expect(coding.system).to eq(external_coding[:system])
+        expect(coding.code).to   eq(external_coding[:code])
 
-      expect(coding.display).to eq(external_coding[:display])
+        expect(coding.display).to eq(external_coding[:display])
     end
   end
 
@@ -252,8 +252,8 @@ describe 'PatientAdministration' do
       pv1_admit_source = pv1.admit_source.to_p
 
       external_coding = gateway.terrminology.coding(
-          admit_source_v_s_identifier,
-          gateway.admit_source_to_code(pv1_admit_source)
+        admit_source_v_s_identifier,
+        gateway.admit_source_to_code(pv1_admit_source)
       )
 
       expect(admit_source.text).to eq(external_coding[:display])
@@ -440,66 +440,26 @@ Organization
     puts pv1.consulting_doctors.to_yaml#, Array[Xcn], position: "PV1.9", multiple: true
     puts pv1.admitting_doctors.to_yaml#, Array[Xcn], position: "PV1.17", multiple: true
     gateway.pv1_to_fhir_participants(pv1).first.tap do |l|
-class Fhir::Practitioner < Fhir::Resource
-  # Text summary of the resource, for human interpretation
-  attribute :text, Fhir::Narrative
-
-  # A identifier for the person as this agent
-  attribute :identifiers, Array[Fhir::Identifier]
-
-  # A name associated with the person
-  attribute :name, Fhir::HumanName
-
-  # A contact detail for the practitioner
-  attribute :telecoms, Array[Fhir::Contact]
-
-  # One or more addresses for the practitioner
-  attribute :address, Fhir::Address
-
-  # Gender for administrative purposes
-  attribute :gender, Fhir::CodeableConcept
-
-  # The date and time of birth for the practitioner
-  attribute :birth_date, DateTime
-
-  # Image of the person
-  attribute :photos, Array[Fhir::Attachment]
-
-  # The represented organization
-  resource_reference :organization, [Fhir::Organization]
-
-  # A role the practitioner has
-  attribute :roles, Array[Fhir::CodeableConcept]
-
-  # Specific specialty of the practitioner
-  attribute :specialties, Array[Fhir::CodeableConcept]
-
-  # The period during which the person is authorized to
-  # perform the service
-  attribute :period, Fhir::Period
-
-  # Qualifications relevant to the provided service.
-  class Qualification < Fhir::ValueObject
-    invariants do
-      validates_presence_of :code
-    end
-
-    # Qualification
-    attribute :code, Fhir::CodeableConcept
-
-    # Period during which the qualification is valid
-    attribute :period, Fhir::Period
-
-    # Organization that regulates and issues the qualification
-    resource_reference :issuer, [Fhir::Organization]
-  end
-
-  attribute :qualifications, Array[Qualification]
-
-  # A language the practitioner is able to use in patient
-  # communication
-  attribute :communications, Array[Fhir::CodeableConcept]
-end
+      gateway.xcn_to_fhir_practitioner(pv1.attending_doctors.first).tap do |p|
+        p.text.shoud# Fhir::Narrative
+        p.identifiers.should#, Array[Fhir::Identifier]
+        p.name.should#, Fhir::HumanName
+        p.telecoms.should#, Array[Fhir::Contact]
+        p.address.should#, Fhir::Address
+        p.gender.should#, Fhir::CodeableConcept
+        p.birth_date.should#, DateTime
+        p.photos.should#, Array[Fhir::Attachment]
+        p.organization.should#, [Fhir::Organization]
+        p.roles.should#, Array[Fhir::CodeableConcept]
+        p.specialties.should#, Array[Fhir::CodeableConcept]
+        p.period.should#, Fhir::Period
+        p.qualifications.first.tap do |q|#, Array[Qualification]
+          q.code.should#, Fhir::CodeableConcept
+          q.period.should#, Fhir::Period
+          q.issuer.should# [Fhir::Organization]
+        end
+        p.communications.should#, Array[Fhir::CodeableConcept]
+      end
     end
   end
 
@@ -532,11 +492,11 @@ end
 
   def assert_gender(gender, administrative_sex)
     coding = gateway.terrminology.coding(
-        administrative_sex_v_s_identifier,
-        administrative_sex.to_p)
-    gender.codings.first.tap do |c|
-      c.code.should    == coding[:code]
-      c.display.should == coding[:display]
-    end
+      administrative_sex_v_s_identifier,
+      administrative_sex.to_p)
+      gender.codings.first.tap do |c|
+        c.code.should    == coding[:code]
+        c.display.should == coding[:display]
+      end
   end
 end

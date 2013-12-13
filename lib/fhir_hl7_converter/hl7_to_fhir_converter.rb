@@ -421,10 +421,17 @@ module FhirHl7Converter
     end
 
     def pv1_to_fhir_participants(pv1)
-      pv1.attending_doctors.map{ |xcn| xcn_to_fhir_practitioner(xcn, 'attending') } +
-        pv1.referring_doctors.map{ |xcn| xcn_to_fhir_practitioner(xcn, 'referring') } +
-        pv1.consulting_doctors.map{ |xcn| xcn_to_fhir_practitioner(xcn, 'consulting') } +
-        pv1.admitting_doctors.map{ |xcn| xcn_to_fhir_practitioner(xcn, 'admitting') }
+      pv1.attending_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'attending') } +
+        pv1.referring_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'referrer') } +
+        pv1.consulting_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'consulting') } +
+        pv1.admitting_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'admitter') }
+    end
+
+    def xcn_to_fhir_participant(xcn, code)
+      Fhir::Practitioner::Participant.new(
+        types: [code],
+        practitioner: xcn_to_fhir_practitioner(xcn)
+      )
     end
 
     def xcn_to_fhir_practitioner(xcn)
