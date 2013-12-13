@@ -68,6 +68,49 @@ module FhirHl7Converter
       )
     end
 
+    def xcn_to_fhir_practitioner(xcn)
+      Fhir::Practitioner.new(
+        text: Fhir::Narrative,
+        identifiers: Array[Fhir::Identifier],
+        name: Fhir::HumanName,
+        telecoms: Array[Fhir::Contact],
+        address: Fhir::Address,
+        gender: Fhir::CodeableConcept,
+        birth_date: DateTime,
+        photos: Array[Fhir::Attachment],
+        organization: [Fhir::Organization],
+        roles: Array[Fhir::CodeableConcept],
+        specialties: Array[Fhir::CodeableConcept],
+        period: Fhir::Period,
+        qualifications: [
+          Fhir::Practitioner::Qualification.new(
+            code: Fhir::CodeableConcept,
+            period: Fhir::Period,
+            issuer: [Fhir::Organization]
+          )
+        ],
+          communications: Array[Fhir::CodeableConcept]
+      )
+    end
+
+    def ce_to_codeable_concept(ce)
+      primary_coding = Fhir::Coding.new(
+        system: ce.name_of_coding_system.try(:to_p),
+        code: ce.identifier.try(:to_p),
+        display: ce.text.try(:to_p))
+
+        if (alternate_identifier = ce.alternate_identifier)
+          secondary_coding = Fhir::Coding.new(
+            system: ce.name_of_alternate_coding_system.try(:to_p),
+            code: alternate_identifier.to_p,
+            display: ce.alternate_text.try(:to_p))
+        end
+        Fhir::CodeableConcept.new(
+          codings: [primary_coding, secondary_coding].compact,
+          text: primary_coding.display || secondary_coding.display
+        )
+    end
+
     #/segment (?) methods
 
     #temp mapping methods

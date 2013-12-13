@@ -32,22 +32,22 @@ module FhirHl7Converter
 
     def encounter
       @encounter ||= Fhir::Encounter.new(
-        text:             EncounterAttributeConverter.pv1_to_fhir_text(@hl7, @terrminology),
-        identifiers:      EncounterAttributeConverter.pv1_to_fhir_identifiers(@hl7, @terrminology),
-        status:           EncounterAttributeConverter.hl7_to_fhir_status(@hl7, @terrminology),
-        encounter_class:  EncounterAttributeConverter.pv1_to_fhir_class(@hl7, @terrminology),
-        types:            EncounterAttributeConverter.pv1_to_fhir_types(@hl7, @terrminology),
+        text:             EncounterAttributeConverter.fhir_text(@hl7, @terrminology),
+        identifiers:      EncounterAttributeConverter.fhir_identifiers(@hl7, @terrminology),
+        status:           EncounterAttributeConverter.fhir_status(@hl7, @terrminology),
+        encounter_class:  EncounterAttributeConverter.fhir_class(@hl7, @terrminology),
+        types:            EncounterAttributeConverter.fhir_types(@hl7, @terrminology),
         subject:          patient,
-        participants:     EncounterAttributeConverter.pv1_to_fhir_participants(@hl7, @terrminology),
-        fulfills:         EncounterAttributeConverter.hl7_to_fhir_fulfills(@hl7, @terrminology),
+        participants:     EncounterAttributeConverter.fhir_participants(@hl7, @terrminology),
+        fulfills:         EncounterAttributeConverter.fhir_fulfills(@hl7, @terrminology),
         start:            nil,
-        length:           EncounterAttributeConverter.pv1_to_fhir_length(@hl7, @terrminology),
-        reason:           EncounterAttributeConverter.hl7_to_fhir_reason(@hl7, @terrminology),
+        length:           EncounterAttributeConverter.fhir_length(@hl7, @terrminology),
+        reason:           EncounterAttributeConverter.fhir_reason(@hl7, @terrminology),
         indication:       nil,#Fhir::Resource,
-        priority:         EncounterAttributeConverter.pv2_to_fhir_priority(@hl7, @terrminology),
-        hospitalization:  EncounterAttributeConverter.hl7_to_fhir_hospitalization(@hl7, @terrminology),
-        locations:        EncounterAttributeConverter.hl7_to_fhir_locations(@hl7, @terrminology),
-        service_provider: EncounterAttributeConverter.hl7_to_fhir_service_provider(@hl7, @terrminology),
+        priority:         EncounterAttributeConverter.fhir_priority(@hl7, @terrminology),
+        hospitalization:  EncounterAttributeConverter.fhir_hospitalization(@hl7, @terrminology),
+        locations:        EncounterAttributeConverter.fhir_locations(@hl7, @terrminology),
+        service_provider: EncounterAttributeConverter.fhir_service_provider(@hl7, @terrminology),
         part_of:          nil#Fhir::Encounter
       )
     end

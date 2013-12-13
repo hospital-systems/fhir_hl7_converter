@@ -2,23 +2,23 @@ module FhirHl7Converter
   module PatientAttributeConverter
     extend self
 
-    def fhir_text(hl7)
+    def fhir_text(hl7, terrminology)
       Fhir::Narrative.new(
           status: 'TODO',
           div: 'TODO'
       )
     end
 
-    def fhir_identifiers(hl7)
+    def fhir_identifiers(hl7, terrminology)
       hl7_to_pid(hl7).patient_identifier_lists.map{ |cx| DataTypeConverter.cx_to_fhir_identifier(cx) }
     end
 
-    def fhir_names(hl7)
+    def fhir_names(hl7, terrminology)
       hl7_to_pid(hl7).patient_names.map{ |xpn| DataTypeConverter.xpn_to_fhir_name(xpn) } +
           hl7_to_pid(hl7).patient_aliases.map{ |xpn| DataTypeConverter.xpn_to_fhir_name(xpn) }
     end
 
-    def fhir_telecoms(hl7)
+    def fhir_telecoms(hl7, terrminology)
       hl7_to_pid(hl7).phone_number_homes.map{ |xtn| DataTypeConverter.xtn_to_fhir_telecom(xtn, 'home') } +
           hl7_to_pid(hl7).phone_number_businesses.map{ |xtn| DataTypeConverter.xtn_to_fhir_telecom(xtn, 'work') }
     end
@@ -27,17 +27,17 @@ module FhirHl7Converter
       administrative_sex_to_gender(hl7_to_pid(hl7).administrative_sex, terrminology)
     end
 
-    def fhir_birth_date(hl7)
+    def fhir_birth_date(hl7, terrminology)
       datetime = hl7_to_pid(hl7).date_time_of_birth.time.try(:to_p)
       datetime && DateTime.parse(datetime)
     end
 
-    def fhir_deceased(hl7)
+    def fhir_deceased(hl7, terrminology)
       deceased = hl7_to_pid(hl7).patient_death_date_and_time.try(:time).try(:to_p)
       deceased.present? && DateTime.parse(deceased) || pid.patient_death_indicator.try(:to_p)
     end
 
-    def fhir_addresses(hl7)
+    def fhir_addresses(hl7, terrminology)
       hl7_to_pid(hl7).patient_addresses.map{ |xad| DataTypeConverter.xad_to_fhir_address(xad) }
     end
 
@@ -53,11 +53,11 @@ module FhirHl7Converter
       )
     end
 
-    def fhir_multiple_birth(hl7)
+    def fhir_multiple_birth(hl7, terrminology)
       hl7_to_pid(hl7).birth_order.try(:to_p) || hl7_to_pid(hl7).multiple_birth_indicator.try(:to_p)
     end
 
-    def fhir_photos(hl7)
+    def fhir_photos(hl7, terrminology)
       hl7_to_obxes(hl7).first.try(:observation_values)
       Fhir::Attachment.new(
           content_type: 'TODO',
@@ -75,7 +75,7 @@ module FhirHl7Converter
     end
 
 
-    def fhir_animal(hl7)
+    def fhir_animal(hl7, terrminology)
       hl7_to_pid(hl7).species_code
       hl7_to_pid(hl7).strain
       Fhir::Patient::Animal.new(
@@ -106,12 +106,12 @@ module FhirHl7Converter
       )
     end
 
-    def fhir_communications(hl7)
+    def fhir_communications(hl7, terrminology)
       hl7_to_lans(hl7).map{ |lan| lan_to_fhir_communication(lan) } if hl7_to_lans(hl7)
     end
 
 
-    def fhir_links(hl7)
+    def fhir_links(hl7, terrminology)
       hl7_to_pid(hl7).patient_identifier_lists
       hl7_to_mrg(hl7).try(:prior_patient_identifier_lists)
       nil
