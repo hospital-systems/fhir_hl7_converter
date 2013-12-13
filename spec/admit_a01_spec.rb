@@ -51,12 +51,12 @@ describe 'PatientAdministration' do
   end
 
   example do
-    gender = FhirHl7Converter::PatientAttributeConverter.pid_to_fhir_gender(hl7, gateway.terrminology)
+    gender = FhirHl7Converter::PatientAttributeConverter.fhir_gender(hl7, gateway.terrminology)
     assert_gender(gender, pid.administrative_sex)
   end
 
   example do
-    birth_date = FhirHl7Converter::PatientAttributeConverter.pid_to_fhir_birth_date(hl7)
+    birth_date = FhirHl7Converter::PatientAttributeConverter.fhir_birth_date(hl7)
     birth_date.should == DateTime.parse(pid.date_time_of_birth.time.to_p)
   end
 
@@ -65,7 +65,7 @@ describe 'PatientAdministration' do
         marital_status_code_v_s_identifier,
         pid.marital_status.identifier.to_p)
 
-    marital_status = FhirHl7Converter::PatientAttributeConverter.pid_to_fhir_marital_status(hl7, gateway.terrminology)
+    marital_status = FhirHl7Converter::PatientAttributeConverter.fhir_marital_status(hl7, gateway.terrminology)
 
     marital_status.codings.first.code.should    == coding[:code]
     marital_status.codings.first.display.should == coding[:display]
@@ -88,12 +88,12 @@ describe 'PatientAdministration' do
   end
 
   example do
-    deceased = FhirHl7Converter::PatientAttributeConverter.pid_to_fhir_deceased(hl7)
+    deceased = FhirHl7Converter::PatientAttributeConverter.fhir_deceased(hl7)
     deceased.should == DateTime.parse(pid.patient_death_date_and_time.time.to_p)
   end
 
   example do
-    FhirHl7Converter::PatientAttributeConverter.pid_to_fhir_multiple_birth(hl7).should == pid.birth_order.to_p
+    FhirHl7Converter::PatientAttributeConverter.fhir_multiple_birth(hl7).should == pid.birth_order.to_p
   end
 
   example do

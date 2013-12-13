@@ -9,22 +9,22 @@ module FhirHl7Converter
 
     def patient
       @patient ||= Fhir::Patient.new(
-          text:           PatientAttributeConverter.pid_to_fhir_text(@hl7),
-          identifiers:    PatientAttributeConverter.pid_to_fhir_identifiers(@hl7),
-          names:          PatientAttributeConverter.pid_to_fhir_names(@hl7),
-          telecoms:       PatientAttributeConverter.pid_to_fhir_telecoms(@hl7),
-          gender:         PatientAttributeConverter.pid_to_fhir_gender(@hl7,         @terrminology),
-          birth_date:     PatientAttributeConverter.pid_to_fhir_birth_date(@hl7),
-          deceased:       PatientAttributeConverter.pid_to_fhir_deceased(@hl7),
-          addresses:      PatientAttributeConverter.pid_to_fhir_addresses(@hl7),
-          marital_status: PatientAttributeConverter.pid_to_fhir_marital_status(@hl7, @terrminology),
-          multiple_birth: PatientAttributeConverter.pid_to_fhir_multiple_birth(@hl7),
-          photos:         PatientAttributeConverter.obxes_to_fhir_photos(@hl7),
-          contacts:       PatientAttributeConverter.nk1s_to_fhir_contacts(@hl7,      @terrminology),
-          animal:         PatientAttributeConverter.pid_to_fhir_animal(@hl7),
-          communications: PatientAttributeConverter.lans_to_fhir_communications(@hl7),
+          text:           PatientAttributeConverter.fhir_text(@hl7),
+          identifiers:    PatientAttributeConverter.fhir_identifiers(@hl7),
+          names:          PatientAttributeConverter.fhir_names(@hl7),
+          telecoms:       PatientAttributeConverter.fhir_telecoms(@hl7),
+          gender:         PatientAttributeConverter.fhir_gender(@hl7,         @terrminology),
+          birth_date:     PatientAttributeConverter.fhir_birth_date(@hl7),
+          deceased:       PatientAttributeConverter.fhir_deceased(@hl7),
+          addresses:      PatientAttributeConverter.fhir_addresses(@hl7),
+          marital_status: PatientAttributeConverter.fhir_marital_status(@hl7, @terrminology),
+          multiple_birth: PatientAttributeConverter.fhir_multiple_birth(@hl7),
+          photos:         PatientAttributeConverter.fhir_photos(@hl7),
+          contacts:       PatientAttributeConverter.fhir_contacts(@hl7,      @terrminology),
+          animal:         PatientAttributeConverter.fhir_animal(@hl7),
+          communications: PatientAttributeConverter.fhir_communications(@hl7),
           provider:       nil,
-          links:          PatientAttributeConverter.pid_mrg_to_fhir_links(@hl7),
+          links:          PatientAttributeConverter.fhir_links(@hl7),
           active:         true
       )
     end
