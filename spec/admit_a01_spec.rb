@@ -19,7 +19,7 @@ describe 'PatientAdministration' do
 
   before(:all) do
     gateway = FhirHl7Converter::Factory.hl7_to_fhir(HealthSeven::Message.parse(fixture('adt_a01')))
-    gateway.terrminology.initialize_data
+    #gateway.terrminology.initialize_data
   end
 
   example do
@@ -335,12 +335,6 @@ end
 attribute :set_id_pv1, Si, position: "PV1.1"
 # Prior Patient Location
 attribute :prior_patient_location, Pl, position: "PV1.6"
-# Attending Doctor
-attribute :attending_doctors, Array[Xcn], position: "PV1.7", multiple: true
-# Referring Doctor
-attribute :referring_doctors, Array[Xcn], position: "PV1.8", multiple: true
-# Consulting Doctor
-attribute :consulting_doctors, Array[Xcn], position: "PV1.9", multiple: true
   # Hospital Service
   attribute :hospital_service, Is, position: "PV1.10"
   # Temporary Location
@@ -351,8 +345,6 @@ attribute :consulting_doctors, Array[Xcn], position: "PV1.9", multiple: true
   attribute :re_admission_indicator, Is, position: "PV1.13"
   # Ambulatory Status
   attribute :ambulatory_statuses, Array[Is], position: "PV1.15", multiple: true
-  # Admitting Doctor
-  attribute :admitting_doctors, Array[Xcn], position: "PV1.17", multiple: true
   # Patient Type
   attribute :patient_type, Is, position: "PV1.18"
   # Financial Class
@@ -433,7 +425,82 @@ attribute :consulting_doctors, Array[Xcn], position: "PV1.9", multiple: true
     .find(identity)
 
     pt.should_not be_nil
+
+Patient
+Encounter
+Location
+Practitioner
+Organization
 =end
+  end
+
+  example do
+    puts pv1.attending_doctors.to_yaml#, Array[Xcn], position: "PV1.7", multiple: true
+    puts pv1.referring_doctors.to_yaml#, Array[Xcn], position: "PV1.8", multiple: true
+    puts pv1.consulting_doctors.to_yaml#, Array[Xcn], position: "PV1.9", multiple: true
+    puts pv1.admitting_doctors.to_yaml#, Array[Xcn], position: "PV1.17", multiple: true
+    gateway.pv1_to_fhir_participants(pv1).first.tap do |l|
+class Fhir::Practitioner < Fhir::Resource
+  # Text summary of the resource, for human interpretation
+  attribute :text, Fhir::Narrative
+
+  # A identifier for the person as this agent
+  attribute :identifiers, Array[Fhir::Identifier]
+
+  # A name associated with the person
+  attribute :name, Fhir::HumanName
+
+  # A contact detail for the practitioner
+  attribute :telecoms, Array[Fhir::Contact]
+
+  # One or more addresses for the practitioner
+  attribute :address, Fhir::Address
+
+  # Gender for administrative purposes
+  attribute :gender, Fhir::CodeableConcept
+
+  # The date and time of birth for the practitioner
+  attribute :birth_date, DateTime
+
+  # Image of the person
+  attribute :photos, Array[Fhir::Attachment]
+
+  # The represented organization
+  resource_reference :organization, [Fhir::Organization]
+
+  # A role the practitioner has
+  attribute :roles, Array[Fhir::CodeableConcept]
+
+  # Specific specialty of the practitioner
+  attribute :specialties, Array[Fhir::CodeableConcept]
+
+  # The period during which the person is authorized to
+  # perform the service
+  attribute :period, Fhir::Period
+
+  # Qualifications relevant to the provided service.
+  class Qualification < Fhir::ValueObject
+    invariants do
+      validates_presence_of :code
+    end
+
+    # Qualification
+    attribute :code, Fhir::CodeableConcept
+
+    # Period during which the qualification is valid
+    attribute :period, Fhir::Period
+
+    # Organization that regulates and issues the qualification
+    resource_reference :issuer, [Fhir::Organization]
+  end
+
+  attribute :qualifications, Array[Qualification]
+
+  # A language the practitioner is able to use in patient
+  # communication
+  attribute :communications, Array[Fhir::CodeableConcept]
+end
+    end
   end
 
   def assert_address(address, xad)

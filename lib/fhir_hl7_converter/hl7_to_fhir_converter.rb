@@ -11,45 +11,45 @@ module FhirHl7Converter
       lans  = hl7_to_lans(@hl7)
       mrg   = hl7_to_mrg(@hl7)
       @patient ||= Fhir::Patient.new(
-          text:           pid_to_fhir_text(@hl7.pid),
-          identifiers:    pid_to_fhir_identifiers(@hl7.pid),
-          names:          pid_to_fhir_names(@hl7.pid),
-          telecoms:       pid_to_fhir_telecoms(@hl7.pid),
-          gender:         pid_to_fhir_gender(@hl7.pid),
-          birth_date:     pid_to_fhir_birth_date(@hl7.pid),
-          deceased:       pid_to_fhir_deceased(@hl7.pid),
-          addresses:      pid_to_fhir_addresses(@hl7.pid),
-          marital_status: pid_to_fhir_marital_status(@hl7.pid),
-          multiple_birth: pid_to_fhir_multiple_birth(@hl7.pid),
-          photos:         obxes_to_fhir_photos(@hl7.obxes),
-          contacts:       nk1s_to_fhir_contacts(@hl7.nk1s),
-          animal:         pid_to_fhir_animal(@hl7.pid),
-          communications: lans_to_fhir_communications(lans),
-          provider:       nil,
-          links:          pid_mrg_to_fhir_links(@hl7.pid, mrg),
-          active:         true
+        text:           pid_to_fhir_text(@hl7.pid),
+        identifiers:    pid_to_fhir_identifiers(@hl7.pid),
+        names:          pid_to_fhir_names(@hl7.pid),
+        telecoms:       pid_to_fhir_telecoms(@hl7.pid),
+        gender:         pid_to_fhir_gender(@hl7.pid),
+        birth_date:     pid_to_fhir_birth_date(@hl7.pid),
+        deceased:       pid_to_fhir_deceased(@hl7.pid),
+        addresses:      pid_to_fhir_addresses(@hl7.pid),
+        marital_status: pid_to_fhir_marital_status(@hl7.pid),
+        multiple_birth: pid_to_fhir_multiple_birth(@hl7.pid),
+        photos:         obxes_to_fhir_photos(@hl7.obxes),
+        contacts:       nk1s_to_fhir_contacts(@hl7.nk1s),
+        animal:         pid_to_fhir_animal(@hl7.pid),
+        communications: lans_to_fhir_communications(lans),
+        provider:       nil,
+        links:          pid_mrg_to_fhir_links(@hl7.pid, mrg),
+        active:         true
       )
     end
 
     def encounter
       @encounter ||= Fhir::Encounter.new(
-          text:             pv1_to_fhir_text(@hl7.pv1),
-          identifiers:      pv1_to_fhir_identifiers(@hl7.pv1),
-          status:           hl7_to_fhir_status(@hl7),
-          encounter_class:  pv1_to_fhir_class(@hl7.pv1),
-          types:            pv1_to_fhir_types(@hl7.pv1),
-          subject:          patient,
-          participants:     pv1_to_fhir_participants(@@hl7.pv1),
-          fulfills:         hl7_to_fhir_fulfills(@hl7),
-          start:            nil,
-          length:           pv1_to_fhir_length(@hl7.pv1),
-          reason:           hl7_to_fhir_reason(@hl7),
-          indication:       nil,#Fhir::Resource,
-          priority:         pv2_to_fhir_priority(@hl7.pv2),
-          hospitalization:  hl7_to_fhir_hospitalization(@hl7),
-          locations:        nil, #hl7_to_fhir_locations(@hl7),
-          service_provider: hl7_to_fhir_service_provider(@hl7),
-          part_of:          nil#Fhir::Encounter
+        text:             pv1_to_fhir_text(@hl7.pv1),
+        identifiers:      pv1_to_fhir_identifiers(@hl7.pv1),
+        status:           hl7_to_fhir_status(@hl7),
+        encounter_class:  pv1_to_fhir_class(@hl7.pv1),
+        types:            pv1_to_fhir_types(@hl7.pv1),
+        subject:          patient,
+        participants:     pv1_to_fhir_participants(@hl7.pv1),
+        fulfills:         hl7_to_fhir_fulfills(@hl7),
+        start:            nil,
+        length:           pv1_to_fhir_length(@hl7.pv1),
+        reason:           hl7_to_fhir_reason(@hl7),
+        indication:       nil,#Fhir::Resource,
+        priority:         pv2_to_fhir_priority(@hl7.pv2),
+        hospitalization:  hl7_to_fhir_hospitalization(@hl7),
+        locations:        nil, #hl7_to_fhir_locations(@hl7),
+        service_provider: hl7_to_fhir_service_provider(@hl7),
+        part_of:          nil#Fhir::Encounter
       )
     end
 
@@ -67,23 +67,23 @@ module FhirHl7Converter
       lans = hl7_to_lans(hl7)
       mrg = hl7_to_mrg(hl7)
       Fhir::Patient.new(
-          text: pid_to_fhir_text(pid),
-          identifiers: pid_to_fhir_identifiers(pid),
-          names: pid_to_fhir_names(pid),
-          telecoms: pid_to_fhir_telecoms(pid),
-          gender: pid_to_fhir_gender(pid),
-          birth_date: pid_to_fhir_birth_date(pid),
-          deceased: pid_to_fhir_deceased(pid),
-          addresses: pid_to_fhir_addresses(pid),
-          marital_status: pid_to_fhir_marital_status(pid),
-          multiple_birth: pid_to_fhir_multiple_birth(pid),
-          photos: obxes_to_fhir_photos(obxes),
-          contacts: nk1s_to_fhir_contacts(nk1s),
-          animal: pid_to_fhir_animal(pid),
-          communications: lans_to_fhir_communications(lans),
-          provider: nil,
-          links: pid_mrg_to_fhir_links(pid, mrg),
-          active: true
+        text: pid_to_fhir_text(pid),
+        identifiers: pid_to_fhir_identifiers(pid),
+        names: pid_to_fhir_names(pid),
+        telecoms: pid_to_fhir_telecoms(pid),
+        gender: pid_to_fhir_gender(pid),
+        birth_date: pid_to_fhir_birth_date(pid),
+        deceased: pid_to_fhir_deceased(pid),
+        addresses: pid_to_fhir_addresses(pid),
+        marital_status: pid_to_fhir_marital_status(pid),
+        multiple_birth: pid_to_fhir_multiple_birth(pid),
+        photos: obxes_to_fhir_photos(obxes),
+        contacts: nk1s_to_fhir_contacts(nk1s),
+        animal: pid_to_fhir_animal(pid),
+        communications: lans_to_fhir_communications(lans),
+        provider: nil,
+        links: pid_mrg_to_fhir_links(pid, mrg),
+        active: true
       )
     end
 
@@ -125,8 +125,8 @@ module FhirHl7Converter
 
     def pid_to_fhir_text(pid)
       Fhir::Narrative.new(
-          status: 'TODO',
-          div: 'TODO'
+        status: 'TODO',
+        div: 'TODO'
       )
     end
 
@@ -136,50 +136,50 @@ module FhirHl7Converter
 
     def cx_to_fhir_identifier(cx)
       Fhir::Identifier.new(
-          use: 'usual',
-          key: cx.id_number.to_p,
-          label: cx.id_number.to_p,
-          system: cx.identifier_type_code.to_p,
-          period: nil,
-          assigner: nil#[Fhir::Organization]
+        use: 'usual',
+        key: cx.id_number.to_p,
+        label: cx.id_number.to_p,
+        system: cx.identifier_type_code.to_p,
+        period: nil,
+        assigner: nil#[Fhir::Organization]
       )
     end
 
     def pid_to_fhir_names(pid)
       pid.patient_names.map{ |xpn| xpn_to_fhir_name(xpn) } +
-          pid.patient_aliases.map{ |xpn| xpn_to_fhir_name(xpn) }
+        pid.patient_aliases.map{ |xpn| xpn_to_fhir_name(xpn) }
     end
 
     def xpn_to_fhir_name(xpn)
       families = xpn.family_name.surname.to_p
       givens = [
-          xpn.given_name,
-          xpn.second_and_further_given_names_or_initials_thereof
+        xpn.given_name,
+        xpn.second_and_further_given_names_or_initials_thereof
       ].compact.map(&:to_p).select{ |n| n.present? }.join(', ')
       prefixes = xpn.prefix.try(:to_p)
       suffixes = xpn.suffix.try(:to_p)
       Fhir::HumanName.new(
-          use: 'TODO',
-          text: [givens, families, prefixes, suffixes].join(' '),#FIXME
-          families: [families],
-          givens: [givens],
-          prefixes: [prefixes],
-          suffixes: [suffixes],
-          period: nil#Fhir::Period.new(start: DateTime.now, end: DateTime.now)
+        use: 'TODO',
+        text: [givens, families, prefixes, suffixes].join(' '),#FIXME
+        families: [families],
+        givens: [givens],
+        prefixes: [prefixes],
+        suffixes: [suffixes],
+        period: nil#Fhir::Period.new(start: DateTime.now, end: DateTime.now)
       )
     end
 
     def pid_to_fhir_telecoms(pid)
       pid.phone_number_homes.map{ |xtn| xtn_to_fhir_telecom(xtn, 'home') } +
-          pid.phone_number_businesses.map{ |xtn| xtn_to_fhir_telecom(xtn, 'work') }
+        pid.phone_number_businesses.map{ |xtn| xtn_to_fhir_telecom(xtn, 'work') }
     end
 
     def xtn_to_fhir_telecom(xtn, use)
       Fhir::Contact.new(
-          system: 'http://hl7.org/fhir/contact-system',
-          value: xtn.telephone_number.to_p,
-          use: use,
-          period: nil#Fhir::Period.new(start: DateTime.now, end: DateTime.now)
+        system: 'http://hl7.org/fhir/contact-system',
+        value: xtn.telephone_number.to_p,
+        use: use,
+        period: nil#Fhir::Period.new(start: DateTime.now, end: DateTime.now)
       )
     end
 
@@ -194,12 +194,12 @@ module FhirHl7Converter
     def administrative_sex_to_gender(administrative_sex)
       sex    = administrative_sex.try(:to_p)
       coding = @terrminology.coding(
-          'http://hl7.org/fhir/vs/administrative-gender',
-          sex
+        'http://hl7.org/fhir/vs/administrative-gender',
+        sex
       )
       sex && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
-          text:    coding[:display] || sex
+        codings: [Fhir::Coding.new(coding)],
+        text:    coding[:display] || sex
       )
     end
 
@@ -219,23 +219,23 @@ module FhirHl7Converter
 
     def xad_to_fhir_address(xad)
       Fhir::Address.new(
-          use: address_type_to_use(xad.address_type.try(:to_p)),
-          text: [
-              xad.street_address.try(:street_or_mailing_address),
-              xad.street_address.try(:street_name),
-              xad.street_address.try(:dwelling_number),
-              xad.other_designation,
-              xad.city,
-              xad.state_or_province,
-              xad.zip_or_postal_code,
-              xad.country
-          ].map(&:to_p).join(' '),
+        use: address_type_to_use(xad.address_type.try(:to_p)),
+        text: [
+          xad.street_address.try(:street_or_mailing_address),
+          xad.street_address.try(:street_name),
+          xad.street_address.try(:dwelling_number),
+          xad.other_designation,
+          xad.city,
+          xad.state_or_province,
+          xad.zip_or_postal_code,
+          xad.country
+        ].map(&:to_p).join(' '),
           lines: [
-              xad.street_address.try(:street_or_mailing_address),
-              xad.street_address.try(:street_name),
-              xad.street_address.try(:dwelling_number),
-              xad.other_designation
-          ].map(&:to_p),
+            xad.street_address.try(:street_or_mailing_address),
+            xad.street_address.try(:street_name),
+            xad.street_address.try(:dwelling_number),
+            xad.other_designation
+        ].map(&:to_p),
           city: xad.city.to_p,
           state: xad.state_or_province.to_p,
           zip: xad.zip_or_postal_code.to_p,
@@ -247,12 +247,12 @@ module FhirHl7Converter
     def pid_to_fhir_marital_status(pid)
       marital_status = pid.marital_status.try(:identifier).try(:to_p)
       coding         = @terrminology.coding(
-          'http://hl7.org/fhir/vs/marital-status',
-          marital_status
+        'http://hl7.org/fhir/vs/marital-status',
+        marital_status
       )
       marital_status && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
-          text:    coding[:display]
+        codings: [Fhir::Coding.new(coding)],
+        text:    coding[:display]
       )
     end
 
@@ -263,13 +263,13 @@ module FhirHl7Converter
     def obxes_to_fhir_photos(obxes)
       obxes.first.try(:observation_values)
       Fhir::Attachment.new(
-          content_type: 'TODO',
-          language: 'TODO',
-          data: 'TODO',
-          url: 'TODO',
-          size: 10,
-          hash: 'TODO',
-          title: 'TODO'
+        content_type: 'TODO',
+        language: 'TODO',
+        data: 'TODO',
+        url: 'TODO',
+        size: 10,
+        hash: 'TODO',
+        title: 'TODO'
       )
     end
 
@@ -279,31 +279,31 @@ module FhirHl7Converter
 
     def nk1_to_fhir_contact(nk1)
       Fhir::Patient::Contact.new(
-          relationships: [
-              Fhir::CodeableConcept.new(
-                  codings: [
-                      Fhir::Coding.new(
-                          system: 'http://hl7.org/fhir/patient-contact-relationship',
-                          code: nk1.relationship.identifier.to_p,
-                          display: nk1.relationship.identifier.to_p
-                      ),
-                      Fhir::Coding.new(
-                          system: 'http://hl7.org/fhir/patient-contact-relationship',
-                          code: nk1.contact_role.identifier.to_p,
-                          display: nk1.relationship.identifier.to_p
-                      )
-                  ],
-                  text: [nk1.relationship.identifier.to_p, nk1.contact_role.identifier.to_p].join(' ')
+        relationships: [
+          Fhir::CodeableConcept.new(
+            codings: [
+              Fhir::Coding.new(
+                system: 'http://hl7.org/fhir/patient-contact-relationship',
+                code: nk1.relationship.identifier.to_p,
+                display: nk1.relationship.identifier.to_p
+              ),
+                Fhir::Coding.new(
+                  system: 'http://hl7.org/fhir/patient-contact-relationship',
+                  code: nk1.contact_role.identifier.to_p,
+                  display: nk1.relationship.identifier.to_p
               )
-          ],
+            ],
+              text: [nk1.relationship.identifier.to_p, nk1.contact_role.identifier.to_p].join(' ')
+          )
+        ],
           name: xpn_to_fhir_name(nk1.names.first),
           telecoms: (
-          nk1.phone_numbers.map{ |xtn| xtn_to_fhir_telecom(xtn, 'home') } +
-              nk1.business_phone_numbers.map{ |xtn| xtn_to_fhir_telecom(xtn, 'work') }
+            nk1.phone_numbers.map{ |xtn| xtn_to_fhir_telecom(xtn, 'home') } +
+            nk1.business_phone_numbers.map{ |xtn| xtn_to_fhir_telecom(xtn, 'work') }
           ),
-          address: xad_to_fhir_address(nk1.addresses.first),
-          gender: nk1_to_fhir_gender(nk1),
-          organization: nil#, [Fhir::Organization]
+            address: xad_to_fhir_address(nk1.addresses.first),
+            gender: nk1_to_fhir_gender(nk1),
+            organization: nil#, [Fhir::Organization]
       )
       #organizationNK1-13, NK1-30, NK1-31, NK1-32, NK1-41
       #nk1.organization_name_nk1s
@@ -316,30 +316,30 @@ module FhirHl7Converter
       pid.species_code
       pid.strain
       Fhir::Patient::Animal.new(
-          species: Fhir::CodeableConcept.new(
-              codings: [Fhir::Coding.new(
-                            system: 'TODO',
-                            code: 'TODO',
-                            display: 'TODO'
-                        )],
-              text: 'TODO'
-          ),
+        species: Fhir::CodeableConcept.new(
+          codings: [Fhir::Coding.new(
+            system: 'TODO',
+            code: 'TODO',
+            display: 'TODO'
+          )],
+            text: 'TODO'
+        ),
           breed: Fhir::CodeableConcept.new(
-              codings: [Fhir::Coding.new(
-                            system: 'TODO',
-                            code: 'TODO',
-                            display: 'TODO'
-                        )],
+            codings: [Fhir::Coding.new(
+              system: 'TODO',
+              code: 'TODO',
+              display: 'TODO'
+            )],
               text: 'TODO'
-          ),
+        ),
           gender_status: Fhir::CodeableConcept.new(
-              codings: [Fhir::Coding.new(
-                            system: 'TODO',
-                            code: 'TODO',
-                            display: 'TODO'
-                        )],
+            codings: [Fhir::Coding.new(
+              system: 'TODO',
+              code: 'TODO',
+              display: 'TODO'
+            )],
               text: 'TODO'
-          )
+        )
       )
     end
 
@@ -350,11 +350,11 @@ module FhirHl7Converter
     def lan_to_fhir_communications(lan)
       lan.language_code
       Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(
-                        system: 'TODO',
-                        code: 'TODO',
-                        display: 'TODO'
-                    )],
+        codings: [Fhir::Coding.new(
+          system: 'TODO',
+          code: 'TODO',
+          display: 'TODO'
+        )],
           text: 'TODO'
       )
     end
@@ -370,23 +370,23 @@ module FhirHl7Converter
       pv1 = hl7_to_pv1(hl7)
       pv2 = hl7_to_pv2(hl7)
       Fhir::Encounter.new(
-          text: pv1_to_fhir_text(pv1),
-          identifiers: pv1_to_fhir_identifiers(pv1),
-          status: hl7_to_fhir_status(hl7),
-          encounter_class: pv1_to_fhir_class(pv1),
-          types: pv1_to_fhir_types(pv1),
-          subject: message_to_fhir_patient(message),
-          participants: pv1_to_fhir_participants(pv1),
-          fulfills: hl7_to_fhir_fulfills(hl7),
-          start: nil,
-          length: pv1_to_fhir_length(pv1),
-          reason: hl7_to_fhir_reason(hl7),
-          indication: nil,#Fhir::Resource,
-          priority: pv2_to_fhir_priority(pv2),
-          hospitalization: hl7_to_fhir_hospitalization(hl7),
-          locations: hl7_to_fhir_locations(hl7),
-          service_provider: hl7_to_fhir_service_provider(hl7),
-          part_of: nil#Fhir::Encounter
+        text: pv1_to_fhir_text(pv1),
+        identifiers: pv1_to_fhir_identifiers(pv1),
+        status: hl7_to_fhir_status(hl7),
+        encounter_class: pv1_to_fhir_class(pv1),
+        types: pv1_to_fhir_types(pv1),
+        subject: message_to_fhir_patient(message),
+        participants: pv1_to_fhir_participants(pv1),
+        fulfills: hl7_to_fhir_fulfills(hl7),
+        start: nil,
+        length: pv1_to_fhir_length(pv1),
+        reason: hl7_to_fhir_reason(hl7),
+        indication: nil,#Fhir::Resource,
+        priority: pv2_to_fhir_priority(pv2),
+        hospitalization: hl7_to_fhir_hospitalization(hl7),
+        locations: hl7_to_fhir_locations(hl7),
+        service_provider: hl7_to_fhir_service_provider(hl7),
+        part_of: nil#Fhir::Encounter
       )
     end
 
@@ -410,25 +410,46 @@ module FhirHl7Converter
     def pv1_to_fhir_types(pv1)
       admission_type = pv1.admission_type.try(:to_p)
       coding         = @terrminology.coding(
-          'http://hl7.org/fhir/v2/vs/0007',
-          admission_type
+        'http://hl7.org/fhir/v2/vs/0007',
+        admission_type
       )
       admission_type && [
-          Fhir::CodeableConcept.new(
-              codings: [Fhir::Coding.new(coding)],
-              text:    coding[:display] || admission_type
-          )]
+        Fhir::CodeableConcept.new(
+          codings: [Fhir::Coding.new(coding)],
+          text:    coding[:display] || admission_type
+        )]
     end
 
     def pv1_to_fhir_participants(pv1)
-=begin
-        [
-          Fhir::Encounter::Participant.new(
-            types: Array[Fhir::Code],# PV1-7, PV1-8, PV1-9, PV1-17
-            practitioner: Fhir::Practitioner#Мое предположение что надо брать данные из: PV1-7, PV1-8, PV1-9, PV1-17
+      pv1.attending_doctors.map{ |xcn| xcn_to_fhir_practitioner(xcn, 'attending') } +
+        pv1.referring_doctors.map{ |xcn| xcn_to_fhir_practitioner(xcn, 'referring') } +
+        pv1.consulting_doctors.map{ |xcn| xcn_to_fhir_practitioner(xcn, 'consulting') } +
+        pv1.admitting_doctors.map{ |xcn| xcn_to_fhir_practitioner(xcn, 'admitting') }
+    end
+
+    def xcn_to_fhir_practitioner(xcn)
+      Fhir::Practitioner.new(
+        text: Fhir::Narrative,
+        identifiers: Array[Fhir::Identifier],
+        name: Fhir::HumanName,
+        telecoms: Array[Fhir::Contact],
+        address: Fhir::Address,
+        gender: Fhir::CodeableConcept,
+        birth_date: DateTime,
+        photos: Array[Fhir::Attachment],
+        organization: [Fhir::Organization],
+        roles: Array[Fhir::CodeableConcept],
+        specialties: Array[Fhir::CodeableConcept],
+        period: Fhir::Period,
+        qualifications: [
+          Fhir::Practitioner::Qualification.new(
+            code: Fhir::CodeableConcept,
+            period: Fhir::Period,
+            issuer: [Fhir::Organization]
           )
         ],
-=end
+          communications: Array[Fhir::CodeableConcept]
+      )
     end
 
     def pv1_to_fhir_length(pv1)
@@ -449,17 +470,17 @@ module FhirHl7Converter
 
     def hl7_to_fhir_hospitalization(hl7)
       Fhir::Encounter::Hospitalization.new(
-          pre_admission_identifier: pv1_to_fhir_pre_admission_identifier(hl7.pv1),
-          origin: nil,#Fhir::Location,
-          admit_source: pv1_to_admit_source(hl7.pv1),
-          period: hl7_to_fhir_period(hl7),
-          accomodations: pv1_to_fhir_accomodations(hl7.pv1),
-          diet: pv1_to_diet(hl7.pv1),
-          special_courtesies: pv1_to_fhir_special_courtesies(hl7.pv1),
-          special_arrangements: pv1_to_fhir_special_arrangements(hl7),
-          destination: nil,#Fhir::Location,
-          discharge_disposition: pv1_to_discharge_disposition(hl7.pv1),
-          re_admission: pv1_to_fhir_re_admission(hl7.pv1)
+        pre_admission_identifier: pv1_to_fhir_pre_admission_identifier(hl7.pv1),
+        origin: nil,#Fhir::Location,
+        admit_source: pv1_to_admit_source(hl7.pv1),
+        period: hl7_to_fhir_period(hl7),
+        accomodations: pv1_to_fhir_accomodations(hl7.pv1),
+        diet: pv1_to_diet(hl7.pv1),
+        special_courtesies: pv1_to_fhir_special_courtesies(hl7.pv1),
+        special_arrangements: pv1_to_fhir_special_arrangements(hl7),
+        destination: nil,#Fhir::Location,
+        discharge_disposition: pv1_to_discharge_disposition(hl7.pv1),
+        re_admission: pv1_to_fhir_re_admission(hl7.pv1)
       )
     end
 
@@ -471,12 +492,12 @@ module FhirHl7Converter
       #Fhir::CodeableConcept,PV1-14-admit source
       admit_source = pv1.admit_source.try(:to_p)
       coding       = @terrminology.coding(
-          'http://hl7.org/fhir/vs/encounter-admit-source',
-          admit_source_to_code(admit_source)
+        'http://hl7.org/fhir/vs/encounter-admit-source',
+        admit_source_to_code(admit_source)
       )
       admit_source && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
-          text:    coding[:display] || admit_source
+        codings: [Fhir::Coding.new(coding)],
+        text:    coding[:display] || admit_source
       )
     end
 
@@ -490,20 +511,20 @@ module FhirHl7Converter
 
     def ce_to_codeable_concept(ce)
       primary_coding = Fhir::Coding.new(
-          system: ce.name_of_coding_system.try(:to_p),
-          code: ce.identifier.try(:to_p),
-          display: ce.text.try(:to_p))
+        system: ce.name_of_coding_system.try(:to_p),
+        code: ce.identifier.try(:to_p),
+        display: ce.text.try(:to_p))
 
-      if (alternate_identifier = ce.alternate_identifier)
-        secondary_coding = Fhir::Coding.new(
+        if (alternate_identifier = ce.alternate_identifier)
+          secondary_coding = Fhir::Coding.new(
             system: ce.name_of_alternate_coding_system.try(:to_p),
             code: alternate_identifier.to_p,
             display: ce.alternate_text.try(:to_p))
-      end
-      Fhir::CodeableConcept.new(
+        end
+        Fhir::CodeableConcept.new(
           codings: [primary_coding, secondary_coding].compact,
           text: primary_coding.display || secondary_coding.display
-      )
+        )
     end
 
     def pv1_to_diet(pv1)
@@ -516,12 +537,12 @@ module FhirHl7Converter
       vip_indicator = pv1.vip_indicator.try(:to_p)
       code          = vip_indicator_to_code(vip_indicator)
       coding        = @terrminology.coding(
-          'http://hl7.org/fhir/vs/encounter-special-courtesy',
-          admit_source_to_code(code)
+        'http://hl7.org/fhir/vs/encounter-special-courtesy',
+        admit_source_to_code(code)
       )
       vip_indicator && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
-          text:    coding[:display])
+        codings: [Fhir::Coding.new(coding)],
+        text:    coding[:display])
     end
 
     def pv1_to_fhir_special_arrangements(hl7)
@@ -531,14 +552,14 @@ module FhirHl7Converter
     def pv1_to_discharge_disposition(pv1)
       discharge_disposition = pv1.discharge_disposition.try(:to_p)
       coding                = @terrminology.coding(
-          'http://hl7.org/fhir/vs/encounter-discharge-disposition',
-          discharge_disposition_to_code(discharge_disposition)
+        'http://hl7.org/fhir/vs/encounter-discharge-disposition',
+        discharge_disposition_to_code(discharge_disposition)
       )
       discharge_disposition && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
-          text:    coding[:display])
+        codings: [Fhir::Coding.new(coding)],
+        text:    coding[:display])
 
-      #Fhir::CodeableConcept,PV1-36-discharge disposition
+        #Fhir::CodeableConcept,PV1-36-discharge disposition
     end
 
     def pv1_to_fhir_re_admission(pv1)
@@ -586,10 +607,10 @@ end
 
     def address_type_to_use(address_type)
       {
-          'H' => 'home',
-          'O' => 'work',
-          'C' => 'temp',
-          'BA' => 'old'
+        'H' => 'home',
+        'O' => 'work',
+        'C' => 'temp',
+        'BA' => 'old'
       }[address_type]
     end
 
