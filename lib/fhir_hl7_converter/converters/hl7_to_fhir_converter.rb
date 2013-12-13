@@ -8,25 +8,23 @@ module FhirHl7Converter
     end
 
     def patient
-      lans  = hl7_to_lans(@hl7)
-      mrg   = hl7_to_mrg(@hl7)
       @patient ||= Fhir::Patient.new(
-          text:           PatientAttributeConverter.pid_to_fhir_text(@hl7.pid),
-          identifiers:    PatientAttributeConverter.pid_to_fhir_identifiers(@hl7.pid),
-          names:          PatientAttributeConverter.pid_to_fhir_names(@hl7.pid),
-          telecoms:       PatientAttributeConverter.pid_to_fhir_telecoms(@hl7.pid),
-          gender:         PatientAttributeConverter.pid_to_fhir_gender(@hl7.pid,         @terrminology),
-          birth_date:     PatientAttributeConverter.pid_to_fhir_birth_date(@hl7.pid),
-          deceased:       PatientAttributeConverter.pid_to_fhir_deceased(@hl7.pid),
-          addresses:      PatientAttributeConverter.pid_to_fhir_addresses(@hl7.pid),
-          marital_status: PatientAttributeConverter.pid_to_fhir_marital_status(@hl7.pid, @terrminology),
-          multiple_birth: PatientAttributeConverter.pid_to_fhir_multiple_birth(@hl7.pid),
-          photos:         PatientAttributeConverter.obxes_to_fhir_photos(@hl7.obxes),
-          contacts:       PatientAttributeConverter.nk1s_to_fhir_contacts(@hl7.nk1s,     @terrminology),
-          animal:         PatientAttributeConverter.pid_to_fhir_animal(@hl7.pid),
-          communications: PatientAttributeConverter.lans_to_fhir_communications(lans),
+          text:           PatientAttributeConverter.pid_to_fhir_text(@hl7),
+          identifiers:    PatientAttributeConverter.pid_to_fhir_identifiers(@hl7),
+          names:          PatientAttributeConverter.pid_to_fhir_names(@hl7),
+          telecoms:       PatientAttributeConverter.pid_to_fhir_telecoms(@hl7),
+          gender:         PatientAttributeConverter.pid_to_fhir_gender(@hl7,         @terrminology),
+          birth_date:     PatientAttributeConverter.pid_to_fhir_birth_date(@hl7),
+          deceased:       PatientAttributeConverter.pid_to_fhir_deceased(@hl7),
+          addresses:      PatientAttributeConverter.pid_to_fhir_addresses(@hl7),
+          marital_status: PatientAttributeConverter.pid_to_fhir_marital_status(@hl7, @terrminology),
+          multiple_birth: PatientAttributeConverter.pid_to_fhir_multiple_birth(@hl7),
+          photos:         PatientAttributeConverter.obxes_to_fhir_photos(@hl7),
+          contacts:       PatientAttributeConverter.nk1s_to_fhir_contacts(@hl7,      @terrminology),
+          animal:         PatientAttributeConverter.pid_to_fhir_animal(@hl7),
+          communications: PatientAttributeConverter.lans_to_fhir_communications(@hl7),
           provider:       nil,
-          links:          PatientAttributeConverter.pid_mrg_to_fhir_links(@hl7.pid, mrg),
+          links:          PatientAttributeConverter.pid_mrg_to_fhir_links(@hl7),
           active:         true
       )
     end
@@ -61,9 +59,6 @@ module FhirHl7Converter
       HealthSeven::Message.parse(message)
     end
 
-    def hl7_to_pid(hl7)
-      hl7.pid
-    end
 
     def hl7_to_pv1(hl7)
       hl7.pv1
@@ -71,22 +66,6 @@ module FhirHl7Converter
 
     def hl7_to_pv2(hl7)
       hl7.pv2
-    end
-
-    def hl7_to_obxes(hl7)
-      hl7.obxes
-    end
-
-    def hl7_to_nk1s(hl7)
-      hl7.nk1s
-    end
-
-    def hl7_to_lans(hl7)
-      hl7.lans if hl7.respond_to?(:lans)
-    end
-
-    def hl7_to_mrg(hl7)
-      hl7.mrg if hl7.respond_to?(:mrg)
     end
 
     def pv1_to_fhir_text(pv1)
