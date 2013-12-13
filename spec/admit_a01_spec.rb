@@ -439,8 +439,8 @@ Organization
     puts pv1.referring_doctors.to_yaml#, Array[Xcn], position: "PV1.8", multiple: true
     puts pv1.consulting_doctors.to_yaml#, Array[Xcn], position: "PV1.9", multiple: true
     puts pv1.admitting_doctors.to_yaml#, Array[Xcn], position: "PV1.17", multiple: true
-    gateway.pv1_to_fhir_participants(pv1).first.tap do |l|
-      gateway.xcn_to_fhir_practitioner(pv1.attending_doctors.first).tap do |p|
+    pv1.attending_doctors.first.tap do |xcn|
+      gateway.xcn_to_fhir_practitioner(xcn).tap do |p|
         p.text.shoud# Fhir::Narrative
         p.identifiers.should#, Array[Fhir::Identifier]
         p.name.should#, Fhir::HumanName
