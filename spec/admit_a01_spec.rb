@@ -220,7 +220,7 @@ describe 'PatientAdministration' do
   end
 
   example do
-    gateway.pv1_to_fhir_special_courtesies(pv1).tap do |special_courtesies|
+    FhirHl7Converter::EncounterAttributeConverter.fhir_special_courtesies(hl7, gateway.terrminology).tap do |special_courtesies|
       expect(special_courtesies.text).to eq(pv1.vip_indicator.to_p)
       special_courtesies.codings.first.tap do |coding|
         expect(coding.code).to eq(pv1.vip_indicator.to_p)
@@ -440,7 +440,7 @@ Organization
     puts pv1.consulting_doctors.to_yaml#, Array[Xcn], position: "PV1.9", multiple: true
     puts pv1.admitting_doctors.to_yaml#, Array[Xcn], position: "PV1.17", multiple: true
     pv1.attending_doctors.first.tap do |xcn|
-      gateway.xcn_to_fhir_practitioner(xcn).tap do |p|
+      FhirHl7Converter::DataTypeConverter.xcn_to_fhir_practitioner(xcn).tap do |p|
         p.text.shoud# Fhir::Narrative
         p.identifiers.should#, Array[Fhir::Identifier]
         p.name.should#, Fhir::HumanName
