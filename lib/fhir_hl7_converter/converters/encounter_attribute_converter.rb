@@ -44,9 +44,9 @@ module FhirHl7Converter
 
 
     def xcn_to_fhir_participant(xcn, code)
-      Fhir::Practitioner::Participant.new(
+      Fhir::Encounter::Participant.new(
         types: [code],
-        practitioner: xcn_to_fhir_practitioner(xcn)
+        practitioner: DataTypeConverter.xcn_to_fhir_practitioner(xcn)
       )
     end
 
