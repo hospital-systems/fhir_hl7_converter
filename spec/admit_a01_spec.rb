@@ -35,7 +35,7 @@ describe 'PatientAdministration' do
 
   example do
     pid.patient_addresses.first.tap do |xad|
-      address = FhirHl7Converter::DataTypeConverter.xad_to_fhir_address(xad)
+      address = FhirHl7Converter::DataTypeConverter.xad_to_fhir_address(xad, gateway.terrminology)
       assert_address(address, xad)
     end
   end
@@ -56,7 +56,7 @@ describe 'PatientAdministration' do
   end
 
   example do
-    birth_date = FhirHl7Converter::PatientAttributeConverter.fhir_birth_date(hl7)
+    birth_date = FhirHl7Converter::PatientAttributeConverter.fhir_birth_date(hl7, gateway.terrminology)
     birth_date.should == DateTime.parse(pid.date_time_of_birth.time.to_p)
   end
 
@@ -88,12 +88,12 @@ describe 'PatientAdministration' do
   end
 
   example do
-    deceased = FhirHl7Converter::PatientAttributeConverter.fhir_deceased(hl7)
+    deceased = FhirHl7Converter::PatientAttributeConverter.fhir_deceased(hl7, gateway.terrminology)
     deceased.should == DateTime.parse(pid.patient_death_date_and_time.time.to_p)
   end
 
   example do
-    FhirHl7Converter::PatientAttributeConverter.fhir_multiple_birth(hl7).should == pid.birth_order.to_p
+    FhirHl7Converter::PatientAttributeConverter.fhir_multiple_birth(hl7, gateway.terrminology).should == pid.birth_order.to_p
   end
 
   example do
@@ -155,12 +155,12 @@ describe 'PatientAdministration' do
   end
 
   example do
-    patient_class = gateway.pv1_to_fhir_class(pv1)
+    patient_class = FhirHl7Converter::EncounterAttributeConverter.fhir_class(hl7, gateway.terrminology)#gateway.pv1_to_fhir_class(pv1)
     patient_class.should == pv1.patient_class.to_p
   end
 
   example do
-    types = gateway.pv1_to_fhir_types(pv1)
+    types = FhirHl7Converter::EncounterAttributeConverter.fhir_types(hl7, gateway.terrminology)
 
     coding = gateway.terrminology.coding(
       admission_type_v_s_identifier,
@@ -178,7 +178,7 @@ describe 'PatientAdministration' do
   end
 
   example do
-    identifiers = gateway.pv1_to_fhir_identifiers(pv1)
+    identifiers = FhirHl7Converter::EncounterAttributeConverter.fhir_identifiers(hl7, gateway.terrminology)
     identifiers.first.tap do |t|
       expect(t.key.should).to eq(pv1.visit_number.id_number.to_p)
       expect(t.label.should).to eq(pv1.visit_number.id_number.to_p)
@@ -187,7 +187,7 @@ describe 'PatientAdministration' do
   end
 
   example do
-    pre_admission_identifier = gateway.pv1_to_fhir_pre_admission_identifier(pv1)
+    pre_admission_identifier = FhirHl7Converter::EncounterAttributeConverter.fhir_pre_admission_identifier(hl7, gateway.terrminology)
     expect(pre_admission_identifier.key)
     .to eq(pv1.preadmit_number.id_number.to_p)
     expect(pre_admission_identifier.label)
@@ -197,14 +197,14 @@ describe 'PatientAdministration' do
   end
 
   example do
-    admit_source = gateway.pv1_to_admit_source(pv1)
+    admit_source = FhirHl7Converter::EncounterAttributeConverter.pv1_to_admit_source(hl7, gateway.terrminology)
     admit_source.first.tap do |t|
       fail 'need mapping'
     end
   end
 
   example do
-    gateway.pv1_to_diet(pv1).tap do |diet|
+    FhirHl7Converter::EncounterAttributeConverter.fhir_diet(hl7, gateway.terrminology).tap do |diet|
       expect(diet.text).to eq(pv1.diet_type.text.to_p)
       diet.codings.first.tap do |primary|
         expect(primary.system).to eq(pv1.diet_type.name_of_coding_system.to_p)
@@ -230,12 +230,12 @@ describe 'PatientAdministration' do
   end
 
   example do
-    gateway.pv1_to_discharge_disposition(pv1).tap do |discharge_disposition|
+    FhirHl7Converter::EncounterAttributeConverter.fhir_discharge_disposition(hl7, gateway.terrminology).tap do |discharge_disposition|
       pv1_discharge_disposition = pv1.discharge_disposition.to_p
 
       external_coding = gateway.terrminology.coding(
         discharge_disposition_v_s_identifier,
-        gateway.discharge_disposition_to_code(pv1_discharge_disposition))
+        FhirHl7Converter::EncounterAttributeConverter.discharge_disposition_to_code(pv1_discharge_disposition, gateway.terrminology))
 
         expect(discharge_disposition.text).to eq(external_coding[:display])
 
@@ -248,12 +248,12 @@ describe 'PatientAdministration' do
   end
 
   example do
-    gateway.pv1_to_admit_source(pv1).tap do |admit_source|
+    FhirHl7Converter::EncounterAttributeConverter.pv1_to_admit_source(hl7, gateway.terrminology).tap do |admit_source|
       pv1_admit_source = pv1.admit_source.to_p
 
       external_coding = gateway.terrminology.coding(
         admit_source_v_s_identifier,
-        gateway.admit_source_to_code(pv1_admit_source)
+        FhirHl7Converter::EncounterAttributeConverter.admit_source_to_code(pv1_admit_source, gateway.terrminology)
       )
 
       expect(admit_source.text).to eq(external_coding[:display])
@@ -267,7 +267,7 @@ describe 'PatientAdministration' do
   end
 
   example do
-    gateway.pv1_to_fhir_re_admission(pv1).tap do |re_admission|
+    FhirHl7Converter::EncounterAttributeConverter.fhir_re_admission(hl7, gateway.terrminology).tap do |re_admission|
       expect(re_admission).to be_true
     end
   end
@@ -285,7 +285,7 @@ describe 'PatientAdministration' do
     puts pv1.temporary_location.to_yaml#, Pl, position: "PV1.11"
     puts pv1.pending_location.to_yaml#, Pl, position: "PV1.42"
     puts pv1.prior_temporary_location.to_yaml#, Pl, position: "PV1.43"
-    gateway.pv1_to_fhir_location(pv1).tap do |l|
+    FhirHl7Converter::EncounterAttributeConverter.fhir_location(hl7, gateway.terrminology).tap do |l|
       l.text#, Fhir::Narrative
       l.name#, String
       l.description#, String
@@ -464,7 +464,7 @@ Organization
   end
 
   def assert_address(address, xad)
-    address.use.should == gateway.address_type_to_use(xad.address_type.to_p)
+    address.use.should == FhirHl7Converter::DataTypeConverter.address_type_to_use(xad.address_type.to_p, gateway.terrminology)
     address.text.should == [
       xad.street_address.try(:street_or_mailing_address),
       xad.street_address.try(:street_name),

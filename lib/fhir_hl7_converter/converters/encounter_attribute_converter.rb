@@ -4,8 +4,10 @@ module FhirHl7Converter
 
     def fhir_text(hl7, terrminology)
       hl7.pv1
-      nil
-      #Fhir::Narrative
+      Fhir::Narrative.new(
+          status: 'TODO',
+          div:    'TODO'
+      )
     end
 
     def fhir_identifiers(hl7, terrminology)
@@ -23,7 +25,7 @@ module FhirHl7Converter
 
     def fhir_types(hl7, terrminology)
       admission_type = hl7.pv1.admission_type.try(:to_p)
-      coding         = @terrminology.coding(
+      coding         = terrminology.coding(
         'http://hl7.org/fhir/v2/vs/0007',
         admission_type
       )
@@ -72,17 +74,17 @@ module FhirHl7Converter
 
     def fhir_hospitalization(hl7, terrminology)
       Fhir::Encounter::Hospitalization.new(
-        pre_admission_identifier: pv1_to_fhir_pre_admission_identifier(hl7.pv1),
+        pre_admission_identifier: fhir_pre_admission_identifier(hl7, terrminology),
         origin: nil,#Fhir::Location,
-        admit_source: pv1_to_admit_source(hl7.pv1),
+        admit_source: pv1_to_admit_source(hl7.pv1, terrminology),
         period: hl7_to_fhir_period(hl7),
         accomodations: pv1_to_fhir_accomodations(hl7.pv1),
-        diet: pv1_to_diet(hl7.pv1),
+        diet: fhir_diet(hl7, terrminology),
         special_courtesies: pv1_to_fhir_special_courtesies(hl7.pv1),
         special_arrangements: pv1_to_fhir_special_arrangements(hl7),
         destination: nil,#Fhir::Location,
         discharge_disposition: pv1_to_discharge_disposition(hl7.pv1),
-        re_admission: pv1_to_fhir_re_admission(hl7.pv1)
+        re_admission: fhir_re_admission(hl7, terrminology)
       )
     end
 
@@ -93,9 +95,9 @@ module FhirHl7Converter
     def pv1_to_admit_source(hl7, terrminology)
       #Fhir::CodeableConcept,PV1-14-admit source
       admit_source = hl7.pv1.admit_source.try(:to_p)
-      coding       = @terrminology.coding(
+      coding       = terrminology.coding(
         'http://hl7.org/fhir/vs/encounter-admit-source',
-        admit_source_to_code(admit_source)
+        admit_source_to_code(admit_source, terrminology)
       )
       admit_source && Fhir::CodeableConcept.new(
         codings: [Fhir::Coding.new(coding)],
@@ -104,6 +106,10 @@ module FhirHl7Converter
     end
 
     def fhir_period(hl7, terrminology)
+      Fhir::Period.new(
+          start: 'TODO',
+          end:   'TODO'
+      )
       #Fhir::Period,PV2-11-actual length of inpatient stay / PV1-44-admit date/time / PV1-45-discharge date/time
     end
 
@@ -113,16 +119,16 @@ module FhirHl7Converter
 
     def fhir_diet(hl7, terrminology)
       # !!! Hl7 not define own codes, so we just passing it to fhir
-      ce_to_codeable_concept(hl7.pv1.diet_type) if hl7.pv1.diet_type
+      DataTypeConverter.ce_to_codeable_concept(hl7.pv1.diet_type) if hl7.pv1.diet_type
     end
 
-    def fhir_special_courtesies(pv1, terrminology)
+    def fhir_special_courtesies(hl7, terrminology)
       #Array[Fhir::CodeableConcept],PV1-16-VIP indicator
-      vip_indicator = pv1.vip_indicator.try(:to_p)
+      vip_indicator = hl7.pv1.vip_indicator.try(:to_p)
       code          = vip_indicator_to_code(vip_indicator)
-      coding        = @terrminology.coding(
+      coding        = terrminology.coding(
         'http://hl7.org/fhir/vs/encounter-special-courtesy',
-        admit_source_to_code(code)
+        admit_source_to_code(code, terrminology)
       )
       vip_indicator && Fhir::CodeableConcept.new(
         codings: [Fhir::Coding.new(coding)],
@@ -135,9 +141,9 @@ module FhirHl7Converter
 
     def fhir_discharge_disposition(hl7, terrminology)
       discharge_disposition = hl7.pv1.discharge_disposition.try(:to_p)
-      coding                = @terrminology.coding(
+      coding                = terrminology.coding(
         'http://hl7.org/fhir/vs/encounter-discharge-disposition',
-        discharge_disposition_to_code(discharge_disposition)
+        discharge_disposition_to_code(discharge_disposition, terrminology)
       )
       discharge_disposition && Fhir::CodeableConcept.new(
         codings: [Fhir::Coding.new(coding)],
@@ -150,9 +156,9 @@ module FhirHl7Converter
       hl7.pv1.re_admission_indicator.try(:to_p) == 'R'
     end
 
-    def fhir_locations(hl7)
+    def fhir_locations(hl7, terrminology)
       [Fhir::Encounter::Location.new(
-        location: pv1_to_fhir_location(hl7),
+        location: fhir_location(hl7, terrminology),
         period: Fhir::Period.new(start: DateTime.now, end: DateTime.now)
       )]
     end
@@ -184,27 +190,26 @@ end
       #Fhir::Organization,PV1-10-hospital service / PL.6 Person Location Type & PL.1 Point of Care (note: V2.x definition is "the treatment or type of surgery that the patient is scheduled to receive"; seems slightly out of alignment with the concept name 'hospital service'. Would not trust that implementations apply this semantic by default)
     end
 
-    def discharge_disposition_to_code(discharge_disposition)
+    def discharge_disposition_to_code(discharge_disposition, terrminology)
       # !!! Add mappings !!! Incomplete
-      {'01' => 'home'}[discharge_disposition]
-    end
-
-    def address_type_to_use(address_type)
-      {
-        'H' => 'home',
-        'O' => 'work',
-        'C' => 'temp',
-        'BA' => 'old'
-      }[address_type]
+      terrminology.map_concept(
+          'http://hl7.org/fhir/v2/vs/0112',
+          discharge_disposition,
+          'http://hl7.org/fhir/vs/encounter-discharge-disposition'
+      )[:code]
     end
 
     def vip_indicator_to_code(vip_indicator)
       vip_indicator
     end
 
-    def admit_source_to_code(admit_source)
+    def admit_source_to_code(admit_source, terrminology)
       #!!! Incomplete
-      {'7' => 'emd'}[admit_source]
+      terrminology.map_concept(
+          'http://hl7.org/fhir/v2/vs/0023',
+          admit_source,
+          'http://hl7.org/fhir/vs/encounter-admit-source'
+      )[:code]
     end
   end
 end

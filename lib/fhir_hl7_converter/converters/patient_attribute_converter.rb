@@ -38,7 +38,7 @@ module FhirHl7Converter
     end
 
     def fhir_addresses(hl7, terrminology)
-      hl7_to_pid(hl7).patient_addresses.map{ |xad| DataTypeConverter.xad_to_fhir_address(xad) }
+      hl7_to_pid(hl7).patient_addresses.map{ |xad| DataTypeConverter.xad_to_fhir_address(xad, terrminology) }
     end
 
     def fhir_marital_status(hl7, terrminology)
@@ -161,7 +161,7 @@ module FhirHl7Converter
           nk1.phone_numbers.map{ |xtn| DataTypeConverter.xtn_to_fhir_telecom(xtn, 'home') } +
               nk1.business_phone_numbers.map{ |xtn| DataTypeConverter.xtn_to_fhir_telecom(xtn, 'work') }
           ),
-          address: DataTypeConverter.xad_to_fhir_address(nk1.addresses.first),
+          address: DataTypeConverter.xad_to_fhir_address(nk1.addresses.first, terrminology),
           gender: nk1_to_fhir_gender(nk1, terrminology),
           organization: nil#, [Fhir::Organization]
       )
