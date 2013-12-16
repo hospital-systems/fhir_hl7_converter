@@ -150,9 +150,9 @@ module FhirHl7Converter
       hl7.pv1.re_admission_indicator.try(:to_p) == 'R'
     end
 
-    def fhir_locations(hl7)
+    def fhir_locations(hl7, terrminology)
       [Fhir::Encounter::Location.new(
-        location: pv1_to_fhir_location(hl7),
+        location: pv1_to_fhir_location(hl7, terrminology),
         period: Fhir::Period.new(start: DateTime.now, end: DateTime.now)
       )]
     end

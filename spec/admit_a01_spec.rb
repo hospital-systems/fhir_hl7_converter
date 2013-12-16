@@ -155,7 +155,7 @@ describe 'PatientAdministration' do
   end
 
   example do
-    patient_class = gateway.pv1_to_fhir_class(pv1)
+    patient_class = FhirHl7Converter::EncounterAttributeConverter.fhir_class(hl7, gateway.terrminology)
     patient_class.should == pv1.patient_class.to_p
   end
 
@@ -285,7 +285,7 @@ describe 'PatientAdministration' do
     puts pv1.temporary_location.to_yaml#, Pl, position: "PV1.11"
     puts pv1.pending_location.to_yaml#, Pl, position: "PV1.42"
     puts pv1.prior_temporary_location.to_yaml#, Pl, position: "PV1.43"
-    gateway.pv1_to_fhir_location(pv1).tap do |l|
+    FhirHl7Converter::EncounterAttributeConverter.fhir_location(hl7, gateway.terrminology).tap do |l|
       l.text#, Fhir::Narrative
       l.name#, String
       l.description#, String
