@@ -182,6 +182,50 @@ end
 
     def fhir_service_provider(hl7, terrminology)
       #Fhir::Organization,PV1-10-hospital service / PL.6 Person Location Type & PL.1 Point of Care (note: V2.x definition is "the treatment or type of surgery that the patient is scheduled to receive"; seems slightly out of alignment with the concept name 'hospital service'. Would not trust that implementations apply this semantic by default)
+=begin
+class Xon < ::HealthSeven::DataType
+  # Organization Name
+  attribute :organization_name, St, position: "XON.1"
+  # Organization Name Type Code
+  attribute :organization_name_type_code, Is, position: "XON.2"
+  # ID Number
+  attribute :id_number, Nm, position: "XON.3"
+  # Check Digit
+  attribute :check_digit, Nm, position: "XON.4"
+  # Check Digit Scheme
+  attribute :check_digit_scheme, Id, position: "XON.5"
+  # Assigning Authority
+  attribute :assigning_authority, Hd, position: "XON.6"
+  # Identifier Type Code
+  attribute :identifier_type_code, Id, position: "XON.7"
+  # Assigning Facility
+  attribute :assigning_facility, Hd, position: "XON.8"
+  # Name Representation Code
+  attribute :name_representation_code, Id, position: "XON.9"
+  # Organization Identifier
+  attribute :organization_identifier, St, position: "XON.10"
+end
+=end
+      Fhir::Organization.new(
+        text: Fhir::Narrative.new(
+          status: 'TODO',
+          div: 'TODO'
+        ),
+        identifiers: Array[Fhir::Identifier],
+        name: 'TODO',
+        type: Fhir::CodeableConcept,
+        telecoms: Array[Fhir::Contact],
+        addresses: Array[Fhir::Address],
+        part_of: Fhir::Organization,
+        contacts: Array[Fhir::Organization::Contact.new(
+          purpose: Fhir::CodeableConcept,
+          name: Fhir::HumanName,
+          telecoms: Array[Fhir::Contact],
+          address: Fhir::Address,
+          gender: Fhir::CodeableConcept
+        )],
+          active: Boolean
+      )
     end
 
     def discharge_disposition_to_code(discharge_disposition)
