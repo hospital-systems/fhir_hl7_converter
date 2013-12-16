@@ -61,7 +61,9 @@ module FhirHl7Converter
     end
 
     def fhir_reason(hl7, terrminology)
-      #*Fhir::Type[String, Fhir::CodeableConcept],EVN-4-event reason code / PV2-3-admit reason (note: PV2-3 is nominally constrained to inpatient admissions; V2.x makes no vocabulary suggestions for PV2-3; would not expect PV2 segment or PV2-3 to be in use in all implementations
+      #hl7.evn.event_reason_code.to_yaml
+      #hl7.pv2.admit_reason.text.to_p
+      hl7.try(:pv2).try(:admit_reason).try(:text).try(:to_p)
     end
 
     def fhir_priority(hl7, terrminology)
