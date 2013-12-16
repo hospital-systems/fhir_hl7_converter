@@ -63,7 +63,7 @@ module FhirHl7Converter
     def fhir_reason(hl7, terrminology)
       #hl7.evn.event_reason_code.to_yaml
       #hl7.pv2.admit_reason.text.to_p
-      hl7.try(:pv2).try(:admit_reason).try(:text).try(:to_p)
+      hl7.try(:pv2).try(:admit_reason).try(:text).try(:to_p) # may be fully encoded with some terminology
     end
 
     def fhir_priority(hl7, terrminology)
