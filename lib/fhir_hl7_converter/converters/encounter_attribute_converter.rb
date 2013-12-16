@@ -109,10 +109,9 @@ module FhirHl7Converter
 
     def fhir_period(hl7, terrminology)
       Fhir::Period.new(
-          start: 'TODO',
-          end:   'TODO'
+          start: hl7.pv1.admit_date_time,
+          end:   hl7.pv1.discharge_date_time
       )
-      #Fhir::Period,PV2-11-actual length of inpatient stay / PV1-44-admit date/time / PV1-45-discharge date/time
     end
 
     def fhir_accomodations(hl7, terrminology)
