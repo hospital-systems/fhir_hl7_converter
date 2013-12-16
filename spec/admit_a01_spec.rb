@@ -155,7 +155,7 @@ describe 'PatientAdministration' do
   end
 
   example do
-    patient_class = FhirHl7Converter::EncounterAttributeConverter.fhir_class(hl7, gateway.terrminology)#gateway.pv1_to_fhir_class(pv1)
+    patient_class = FhirHl7Converter::EncounterAttributeConverter.fhir_class(hl7, gateway.terrminology)
     patient_class.should == pv1.patient_class.to_p
   end
 
