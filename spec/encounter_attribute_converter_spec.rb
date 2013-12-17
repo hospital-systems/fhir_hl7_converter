@@ -285,7 +285,8 @@ attribute :prior_patient_location, Pl, position: "PV1.6"
 
   describe '#fhir_period' do
     it 'should convert hl7 admit_date_time and discharge_date_time into fhir period' do
-      pending
+      subject.fhir_period(hl7, terrminology).start.should == Time.parse(hl7.pv1.admit_date_time.time.to_p)
+      subject.fhir_period(hl7, terrminology).end.should   == (hl7.pv1.discharge_date_times.blank? ? nil : Time.parse(hl7.pv1.discharge_date_times.first.time.to_p))
     end
   end
 end
