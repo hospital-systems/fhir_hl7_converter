@@ -110,8 +110,8 @@ module FhirHl7Converter
     def fhir_period(hl7, terrminology)
       #TODO: implement spec
       Fhir::Period.new(
-          start: hl7.pv1.admit_date_time,
-          end:   hl7.pv1.discharge_date_time
+          start: Time.parse(hl7.pv1.admit_date_time.time.to_p),
+          end:   hl7.pv1.discharge_date_times.blank? ? nil : Time.parse(hl7.pv1.discharge_date_times.first.time.to_p)
       )
     end
 
