@@ -108,6 +108,7 @@ module FhirHl7Converter
     end
 
     def fhir_period(hl7, terrminology)
+      #TODO: implement spec
       Fhir::Period.new(
           start: hl7.pv1.admit_date_time,
           end:   hl7.pv1.discharge_date_time
