@@ -79,6 +79,11 @@ describe FhirHl7Converter::DataTypeConverter do
             n.suffixes.first.should == xcn.suffix.to_p
             n.prefixes.first.should == xcn.prefix.to_p
           end
+          p.qualifications.first.tap do |q|
+            q.code.codings.first.code.should == xcn.degree.to_p
+            #q.period.should#, Fhir::Period
+            #q.issuer.should# [Fhir::Organization]
+          end
           p.address.should#, Fhir::Address
           p.gender.should#, Fhir::CodeableConcept
           p.birth_date.should#, DateTime
@@ -87,17 +92,10 @@ describe FhirHl7Converter::DataTypeConverter do
           p.roles.should#, Array[Fhir::CodeableConcept]
           p.specialties.should#, Array[Fhir::CodeableConcept]
           p.period.should#, Fhir::Period
-          p.qualifications.first.tap do |q|#, Array[Qualification]
-            q.code.should#, Fhir::CodeableConcept
-            q.period.should#, Fhir::Period
-            q.issuer.should# [Fhir::Organization]
-          end
           p.communications.should#, Array[Fhir::CodeableConcept]
         end
 =begin
 class Xcn < ::HealthSeven::DataType
-  # Degree (e.g., MD)
-  attribute :degree, Is, position: "XCN.7"
   # Source Table
   attribute :source_table, Is, position: "XCN.8"
   # Assigning Authority
@@ -132,7 +130,6 @@ class Xcn < ::HealthSeven::DataType
   attribute :assigning_agency_or_department, Cwe, position: "XCN.23"
 end
 1. XCN – this table summarises the mappings from XCN to practitioner:
-7Degree (e.g., MD)MDPractitioner.qualification.code
 8Source TableNo equivalent in FHIR (e.g. extension if really necessary)
 9Assigning AuthorityPractitioner.identifier.system and/or Practitioner.name.assigner
 10Name Type CodeableConceptPractitioner.name.use

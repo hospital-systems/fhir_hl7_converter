@@ -95,29 +95,38 @@ module FhirHl7Converter
               prefixes: [prefixes],
               suffixes: [suffixes],
               period: nil#Fhir::Period.new(start: DateTime.now, end: DateTime.now)
-          )
+          ),
+            telecoms: nil,#Array[Fhir::Contact],
+            address: nil,#Fhir::Address,
+            gender: nil,#Fhir::CodeableConcept,
+            birth_date: nil,#DateTime,
+            photos: nil,#Array[Fhir::Attachment],
+            organization: nil,#[Fhir::Organization],
+            roles: nil,#Array[Fhir::CodeableConcept],
+            specialties: nil,#Array[Fhir::CodeableConcept],
+            period: nil,#Fhir::Period,
+            qualifications: xcn_to_fhir_practitioner_qualifications(xcn),
+            communications: nil#Array[Fhir::CodeableConcept]
       )
-=begin
     end
-        telecoms: Array[Fhir::Contact],
-        address: Fhir::Address,
-        gender: Fhir::CodeableConcept,
-        birth_date: DateTime,
-        photos: Array[Fhir::Attachment],
-        organization: [Fhir::Organization],
-        roles: Array[Fhir::CodeableConcept],
-        specialties: Array[Fhir::CodeableConcept],
-        period: Fhir::Period,
-        qualifications: [
+
+    def xcn_to_fhir_practitioner_qualifications(xcn)
+      if xcn.degree.try(:to_p).present?
+        [
           Fhir::Practitioner::Qualification.new(
-            code: Fhir::CodeableConcept,
-            period: Fhir::Period,
-            issuer: [Fhir::Organization]
+            code:
+            Fhir::CodeableConcept.new(
+              codings: [Fhir::Coding.new(
+                system: 'TODO',
+                code: xcn.degree.to_p,
+                display: xcn.degree.to_p)],
+                text: xcn.degree.to_p
+            ),
+              period: nil,#Fhir::Period,
+              issuer: nil#[Fhir::Organization]
           )
-        ],
-          communications: Array[Fhir::CodeableConcept]
-      )
-=end
+        ]
+      end
     end
 
     def ce_to_codeable_concept(ce)
