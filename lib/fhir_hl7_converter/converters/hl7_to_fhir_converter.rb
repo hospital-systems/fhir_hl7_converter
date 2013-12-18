@@ -39,7 +39,9 @@ module FhirHl7Converter
         types:            EncounterAttributeConverter.fhir_types(@hl7, @terrminology),
         subject:          patient,
         participants:     EncounterAttributeConverter.fhir_participants(@hl7, @terrminology),
+        #TODO: откуда взялся fulfills?
         fulfills:         EncounterAttributeConverter.fhir_fulfills(@hl7, @terrminology),
+        #TODO: почему start вместо period?
         start:            nil,
         length:           EncounterAttributeConverter.fhir_length(@hl7, @terrminology),
         reason:           EncounterAttributeConverter.fhir_reason(@hl7, @terrminology),

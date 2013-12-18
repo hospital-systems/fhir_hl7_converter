@@ -19,35 +19,46 @@ describe FhirHl7Converter::PatientAttributeConverter do
     #gateway.terrminology.initialize_data
   end
 
-  example do
-    gender = subject.fhir_gender(hl7, gateway.terrminology)
-    assert_gender(gender, pid.administrative_sex)
+  describe '#fhir_gender' do
+    it 'should create codeable concept containing gender from hl7 message' do
+      gender = subject.fhir_gender(hl7, gateway.terrminology)
+      assert_gender(gender, pid.administrative_sex)
+    end
   end
 
-  example do
-    birth_date = subject.fhir_birth_date(hl7, gateway.terrminology)
-    birth_date.should == DateTime.parse(pid.date_time_of_birth.time.to_p)
+  describe '#fhir_birth_date' do
+    it 'should create birth date_time from hl7 message' do
+      birth_date = subject.fhir_birth_date(hl7, gateway.terrminology)
+      birth_date.should == DateTime.parse(pid.date_time_of_birth.time.to_p)
+    end
   end
 
-  example do
-    coding = gateway.terrminology.coding(
-      marital_status_code_v_s_identifier,
-      pid.marital_status.identifier.to_p)
+  describe '#fhir_marital_status' do
+    it 'should create codeable concept containing marital status from hl7 message' do
+      coding = gateway.terrminology.coding(
+        marital_status_code_v_s_identifier,
+        pid.marital_status.identifier.to_p
+      )
 
       marital_status = subject.fhir_marital_status(hl7, gateway.terrminology)
 
       marital_status.codings.first.code.should    == coding[:code]
       marital_status.codings.first.display.should == coding[:display]
       marital_status.text.should                  == coding[:display]
+    end
   end
 
-  example do
-    deceased = subject.fhir_deceased(hl7, gateway.terrminology)
-    deceased.should == DateTime.parse(pid.patient_death_date_and_time.time.to_p)
+  describe '#fhir_deceased' do
+    it 'should create death time from hl7 message' do
+      deceased = subject.fhir_deceased(hl7, gateway.terrminology)
+      deceased.should == DateTime.parse(pid.patient_death_date_and_time.time.to_p)
+    end
   end
 
-  example do
-    subject.fhir_multiple_birth(hl7, gateway.terrminology).should == pid.birth_order.to_p
+  describe '#fhir_multiple_birth' do
+    it 'should create order of multiple births from hl7 message' do
+      subject.fhir_multiple_birth(hl7, gateway.terrminology).should == pid.birth_order.to_p
+    end
   end
 
   example do
