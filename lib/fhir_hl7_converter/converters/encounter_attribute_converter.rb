@@ -82,8 +82,8 @@ module FhirHl7Converter
         period: hl7_to_fhir_period(hl7),
         accomodations: pv1_to_fhir_accomodations(hl7.pv1),
         diet: fhir_diet(hl7, terrminology),
-        special_courtesies: pv1_to_fhir_special_courtesies(hl7.pv1),
-        special_arrangements: pv1_to_fhir_special_arrangements(hl7),
+        special_courtesies: fhir_special_courtesies(hl7, terrminology),
+        special_arrangements: fhir_special_arrangements(hl7, terrminology),
         destination: nil,#Fhir::Location,
         discharge_disposition: pv1_to_discharge_disposition(hl7.pv1),
         re_admission: fhir_re_admission(hl7, terrminology)
