@@ -24,8 +24,8 @@ describe FhirHl7Converter::EncounterAttributeConverter do
     types = subject.fhir_types(hl7, gateway.terrminology)
 
     coding = gateway.terrminology.coding(
-        admission_type_v_s_identifier,
-        pv1.admission_type.to_p
+      admission_type_v_s_identifier,
+      pv1.admission_type.to_p
     )
 
     types.first.tap do |t|
@@ -95,16 +95,16 @@ describe FhirHl7Converter::EncounterAttributeConverter do
       pv1_discharge_disposition = pv1.discharge_disposition.to_p
 
       external_coding = gateway.terrminology.coding(
-          discharge_disposition_v_s_identifier,
-          subject.discharge_disposition_to_code(pv1_discharge_disposition, gateway.terrminology))
+        discharge_disposition_v_s_identifier,
+        subject.discharge_disposition_to_code(pv1_discharge_disposition, gateway.terrminology))
 
-      expect(discharge_disposition.text).to eq(external_coding[:display])
+        expect(discharge_disposition.text).to eq(external_coding[:display])
 
-      coding = discharge_disposition.codings.first
-      expect(coding.system).to eq(external_coding[:system])
-      expect(coding.code).to   eq(external_coding[:code])
+        coding = discharge_disposition.codings.first
+        expect(coding.system).to eq(external_coding[:system])
+        expect(coding.code).to   eq(external_coding[:code])
 
-      expect(coding.display).to eq(external_coding[:display])
+        expect(coding.display).to eq(external_coding[:display])
     end
   end
 
@@ -113,8 +113,8 @@ describe FhirHl7Converter::EncounterAttributeConverter do
       pv1_admit_source = pv1.admit_source.to_p
 
       external_coding = gateway.terrminology.coding(
-          admit_source_v_s_identifier,
-          subject.admit_source_to_code(pv1_admit_source, gateway.terrminology)
+        admit_source_v_s_identifier,
+        subject.admit_source_to_code(pv1_admit_source, gateway.terrminology)
       )
 
       expect(admit_source.text).to eq(external_coding[:display])
@@ -135,143 +135,31 @@ describe FhirHl7Converter::EncounterAttributeConverter do
 
   example do
     pv1.assigned_patient_location.tap do |l|
-      puts l.point_of_care.to_p
-      puts l.room.to_p
-      puts l.bed.to_p
-      l.facility.tap do |f|
-        puts f.namespace_id.to_p
+      subject.fhir_location(hl7, gateway.terrminology).tap do |bed|
+        bed.name.should == l.bed.to_p
+        bed.description.should == l.bed.to_p
+        #bed.mode.should == 'instance'
+        #bed.status.should == 'active'
+        bed.part_of.tap do |room|
+          room.name.should == l.room.to_p
+          room.description.should == l.room.to_p
+          #room.mode.should == 'kind'
+          #room.status.should == 'active'
+          room.part_of.tap do |point_of_care|
+            point_of_care.name.should == l.point_of_care.to_p
+            point_of_care.description.should == l.point_of_care.to_p
+            #point_of_care.mode.should == 'kind'
+            #point_of_care.status.should == 'active'
+            point_of_care.part_of.tap do |facility|
+              facility.name.should == l.facility.namespace_id.to_p
+              facility.description.should == l.facility.namespace_id.to_p
+              #facility.mode.should == 'kind'
+              #facility.status.should == 'active'
+            end
+          end
+        end
       end
     end
-    puts pv1.prior_patient_location.to_yaml#, Pl, position: "PV1.6"
-    puts pv1.temporary_location.to_yaml#, Pl, position: "PV1.11"
-    puts pv1.pending_location.to_yaml#, Pl, position: "PV1.42"
-    puts pv1.prior_temporary_location.to_yaml#, Pl, position: "PV1.43"
-    subject.fhir_location(hl7, gateway.terrminology).tap do |l|
-      l.text#, Fhir::Narrative
-      l.name#, String
-      l.description#, String
-      l.types#, Array[Fhir::CodeableConcept]
-      l.telecom#, Fhir::Contact
-      l.address#, Fhir::Address
-      l.position.tap do |p|#, Position
-        p.longitude#, Float
-        p.latitude#, Float
-        p.altitude#, Float
-      end
-      l.provider#, [Fhir::Organization]
-      l.active#, Boolean
-      l.part_of#, [Fhir::Location]
-    end
-
-=begin
-class Pl < ::HealthSeven::DataType
-  # Point of Care
-  attribute :point_of_care, Is, position: "PL.1"
-  # Room
-  attribute :room, Is, position: "PL.2"
-  # Bed
-  attribute :bed, Is, position: "PL.3"
-  # Facility
-  attribute :facility, Hd, position: "PL.4"
-  # Location Status
-  attribute :location_status, Is, position: "PL.5"
-  # Person Location Type
-  attribute :person_location_type, Is, position: "PL.6"
-  # Building
-  attribute :building, Is, position: "PL.7"
-  # Floor
-  attribute :floor, Is, position: "PL.8"
-  # Location Description
-  attribute :location_description, St, position: "PL.9"
-  # Comprehensive Location Identifier
-  attribute :comprehensive_location_identifier, Ei, position: "PL.10"
-  # Assigning Authority for Location
-  attribute :assigning_authority_for_location, Hd, position: "PL.11"
-end
-    end
-  end
-
-  example do
-=begin
-# Set ID - PV1
-attribute :set_id_pv1, Si, position: "PV1.1"
-# Prior Patient Location
-attribute :prior_patient_location, Pl, position: "PV1.6"
-  # Hospital Service
-  attribute :hospital_service, Is, position: "PV1.10"
-  # Temporary Location
-  attribute :temporary_location, Pl, position: "PV1.11"
-  # Preadmit Test Indicator
-  attribute :preadmit_test_indicator, Is, position: "PV1.12"
-  # Re-admission Indicator
-  attribute :re_admission_indicator, Is, position: "PV1.13"
-  # Ambulatory Status
-  attribute :ambulatory_statuses, Array[Is], position: "PV1.15", multiple: true
-  # Patient Type
-  attribute :patient_type, Is, position: "PV1.18"
-  # Financial Class
-  attribute :financial_classes, Array[Fc], position: "PV1.20", multiple: true
-  # Charge Price Indicator
-  attribute :charge_price_indicator, Is, position: "PV1.21"
-  # Courtesy Code
-  attribute :courtesy_code, Is, position: "PV1.22"
-  # Credit Rating
-  attribute :credit_rating, Is, position: "PV1.23"
-  # Contract Code
-  attribute :contract_codes, Array[Is], position: "PV1.24", multiple: true
-  # Contract Effective Date
-  attribute :contract_effective_dates, Array[Dt], position: "PV1.25", multiple: true
-  # Contract Amount
-  attribute :contract_amounts, Array[Nm], position: "PV1.26", multiple: true
-  # Contract Period
-  attribute :contract_periods, Array[Nm], position: "PV1.27", multiple: true
-  # Interest Code
-  attribute :interest_code, Is, position: "PV1.28"
-  # Transfer to Bad Debt Code
-  attribute :transfer_to_bad_debt_code, Is, position: "PV1.29"
-  # Transfer to Bad Debt Date
-  attribute :transfer_to_bad_debt_date, Dt, position: "PV1.30"
-  # Bad Debt Agency Code
-  attribute :bad_debt_agency_code, Is, position: "PV1.31"
-  # Bad Debt Transfer Amount
-  attribute :bad_debt_transfer_amount, Nm, position: "PV1.32"
-  # Bad Debt Recovery Amount
-  attribute :bad_debt_recovery_amount, Nm, position: "PV1.33"
-  # Delete Account Indicator
-  attribute :delete_account_indicator, Is, position: "PV1.34"
-  # Delete Account Date
-  attribute :delete_account_date, Dt, position: "PV1.35"
-  # Discharged to Location
-  attribute :discharged_to_location, Dld, position: "PV1.37"
-  # Servicing Facility
-  attribute :servicing_facility, Is, position: "PV1.39"
-  # Bed Status
-  attribute :bed_status, Is, position: "PV1.40"
-  # Account Status
-  attribute :account_status, Is, position: "PV1.41"
-  # Pending Location
-  attribute :pending_location, Pl, position: "PV1.42"
-  # Prior Temporary Location
-  attribute :prior_temporary_location, Pl, position: "PV1.43"
-  # Admit Date/Time
-  attribute :admit_date_time, Ts, position: "PV1.44"
-  # Discharge Date/Time
-  attribute :discharge_date_times, Array[Ts], position: "PV1.45", multiple: true
-  # Current Patient Balance
-  attribute :current_patient_balance, Nm, position: "PV1.46"
-  # Total Charges
-  attribute :total_charges, Nm, position: "PV1.47"
-  # Total Adjustments
-  attribute :total_adjustments, Nm, position: "PV1.48"
-  # Total Payments
-  attribute :total_payments, Nm, position: "PV1.49"
-  # Alternate Visit ID
-  attribute :alternate_visit_id, Cx, position: "PV1.50"
-  # Visit Indicator
-  attribute :visit_indicator, Is, position: "PV1.51"
-  # Other Healthcare Provider
-  attribute :other_healthcare_providers, Array[Xcn], position: "PV1.52", multiple: true
-=end
   end
 
   example do

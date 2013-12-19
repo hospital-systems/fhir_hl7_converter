@@ -65,10 +65,10 @@ describe FhirHl7Converter::DataTypeConverter do
 
   describe '#xcn_to_fhir_practitioner' do
     it 'should create fhir practitioner from xcn segment' do
-      puts pv1.attending_doctors.to_yaml#, Array[Xcn], position: "PV1.7", multiple: true
-      puts pv1.referring_doctors.to_yaml#, Array[Xcn], position: "PV1.8", multiple: true
-      puts pv1.consulting_doctors.to_yaml#, Array[Xcn], position: "PV1.9", multiple: true
-      puts pv1.admitting_doctors.to_yaml#, Array[Xcn], position: "PV1.17", multiple: true
+      #puts pv1.attending_doctors.to_yaml#, Array[Xcn], position: "PV1.7", multiple: true
+      #puts pv1.referring_doctors.to_yaml#, Array[Xcn], position: "PV1.8", multiple: true
+      #puts pv1.consulting_doctors.to_yaml#, Array[Xcn], position: "PV1.9", multiple: true
+      #puts pv1.admitting_doctors.to_yaml#, Array[Xcn], position: "PV1.17", multiple: true
       pv1.attending_doctors.first.tap do |xcn|
         subject.xcn_to_fhir_practitioner(xcn).tap do |p|
           #p.text.should# Fhir::Narrative
@@ -78,12 +78,16 @@ describe FhirHl7Converter::DataTypeConverter do
             n.givens.first.should == xcn.given_name.to_p + ', ' + xcn.second_and_further_given_names_or_initials_thereof.to_p
             n.suffixes.first.should == xcn.suffix.to_p
             n.prefixes.first.should == xcn.prefix.to_p
+            n.use.should == xcn.name_type_code.to_p
           end
           p.qualifications.first.tap do |q|
             q.code.codings.first.code.should == xcn.degree.to_p
             #q.period.should#, Fhir::Period
             #q.issuer.should# [Fhir::Organization]
           end
+#9Assigning AuthorityPractitioner.identifier.system and/or Practitioner.name.assigner
+  # Assigning Authority
+          #puts xcn.assigning_authority.namespace_id.to_p
           p.address.should#, Fhir::Address
           p.gender.should#, Fhir::CodeableConcept
           p.birth_date.should#, DateTime
@@ -98,10 +102,6 @@ describe FhirHl7Converter::DataTypeConverter do
 class Xcn < ::HealthSeven::DataType
   # Source Table
   attribute :source_table, Is, position: "XCN.8"
-  # Assigning Authority
-  attribute :assigning_authority, Hd, position: "XCN.9"
-  # Name Type Code
-  attribute :name_type_code, Id, position: "XCN.10"
   # Identifier Check Digit
   attribute :identifier_check_digit, St, position: "XCN.11"
   # Check Digit Scheme
@@ -130,9 +130,6 @@ class Xcn < ::HealthSeven::DataType
   attribute :assigning_agency_or_department, Cwe, position: "XCN.23"
 end
 1. XCN – this table summarises the mappings from XCN to practitioner:
-8Source TableNo equivalent in FHIR (e.g. extension if really necessary)
-9Assigning AuthorityPractitioner.identifier.system and/or Practitioner.name.assigner
-10Name Type CodeableConceptPractitioner.name.use
 11Identifier Check DigitNo equivalent in FHIR (e.g. extension if really necessary)
 12Check Digit SchemeNo equivalent in FHIR (e.g. extension if really necessary)
 13Identifier Type CodeableConceptPractitionerPractitioner.identifier.value

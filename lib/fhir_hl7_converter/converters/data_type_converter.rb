@@ -88,7 +88,7 @@ module FhirHl7Converter
             assigner: nil
           )],
             name: Fhir::HumanName.new(
-              use: 'TODO',
+              use: xcn.name_type_code.to_p,
               text: [givens, families, prefixes, suffixes].join(' '),#FIXME
               families: [families],
               givens: [givens],

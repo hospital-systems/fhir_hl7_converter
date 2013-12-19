@@ -5,8 +5,8 @@ module FhirHl7Converter
     def fhir_text(hl7, terrminology)
       hl7.pv1
       Fhir::Narrative.new(
-          status: 'TODO',
-          div:    'TODO'
+        status: 'TODO',
+        div:    'TODO'
       )
     end
 
@@ -110,8 +110,8 @@ module FhirHl7Converter
     def fhir_period(hl7, terrminology)
       #TODO: implement spec
       Fhir::Period.new(
-          start: Time.parse(hl7.pv1.admit_date_time.time.to_p),
-          end:   hl7.pv1.discharge_date_times.blank? ? nil : Time.parse(hl7.pv1.discharge_date_times.first.time.to_p)
+        start: Time.parse(hl7.pv1.admit_date_time.time.to_p),
+        end:   hl7.pv1.discharge_date_times.blank? ? nil : Time.parse(hl7.pv1.discharge_date_times.first.time.to_p)
       )
     end
 
@@ -170,45 +170,31 @@ module FhirHl7Converter
 
     def fhir_location(hl7, terrminology)
       #TODO: process previous location and previous temporary location?
-      location = hl7.pv1.assigned_patient_location || hl7.pv1.temporary_location
-      name = {}
-      %w(facility point_of_care room bed).each do |name_part|
-        name[name_part] = location.name_part.to_p if location.name_part
-      end
-
+      l = hl7.pv1.assigned_patient_location || hl7.pv1.temporary_location
       Fhir::Location.new(
-          text:                  'TODO',
-          name:                  name.flatten.join(' '),
-          description:           location.description.to_p,
-          types:                 'TODO',
-          telecom:               nil,
-          address:               nil,
-          position:              nil,
-          managing_organization: nil,
-          status:                'TODO',
-          part_of:               'TODO',
-          mode:                  'TODO'
+        name: l.bed.to_p,
+        description: l.bed.to_p,
+        #mode: 'instance',
+        #status: 'active',
+        part_of: Fhir::Location.new(
+          name: l.room.to_p,
+          description: l.room.to_p,
+          #mode: 'kind',
+          #status: 'active',
+          part_of: Fhir::Location.new(
+            name: l.point_of_care.to_p,
+            description: l.point_of_care.to_p,
+            #mode: 'kind',
+            #status: 'active',
+            part_of: Fhir::Location.new(
+              name: l.facility.namespace_id.to_p,
+              description: l.facility.namespace_id.to_p,
+              #mode: 'kind',
+              #status: 'active'
+            )
+          )
+        )
       )
-      #Fhir::Location,PV1-3-assigned patient location / PV1-6-prior patient location / PV1-11-temporary location / PV1-42-pending location / PV1-43-prior temporary location
-=begin
-class Fhir::Location < Fhir::Resource
-  attribute :text, Fhir::Narrative
-  attribute :name, String
-  attribute :description, String
-  attribute :types, Array[Fhir::CodeableConcept]
-  attribute :telecom, Fhir::Contact
-  attribute :address, Fhir::Address
-  class Position < Fhir::ValueObject
-    attribute :longitude, Float
-    attribute :latitude, Float
-    attribute :altitude, Float
-  end
-  attribute :position, Position
-  resource_reference :provider, [Fhir::Organization]
-  attribute :active, Boolean
-  resource_reference :part_of, [Fhir::Location]
-end
-=end
     end
 
     def fhir_service_provider(hl7, terrminology)
@@ -242,29 +228,29 @@ end
           status: 'TODO',
           div: 'TODO'
         ),
-        identifiers: Array[Fhir::Identifier],
-        name: 'TODO',
-        type: Fhir::CodeableConcept,
-        telecoms: Array[Fhir::Contact],
-        addresses: Array[Fhir::Address],
-        part_of: Fhir::Organization,
-        contacts: Array[Fhir::Organization::Contact.new(
-          purpose: Fhir::CodeableConcept,
-          name: Fhir::HumanName,
+          identifiers: Array[Fhir::Identifier],
+          name: 'TODO',
+          type: Fhir::CodeableConcept,
           telecoms: Array[Fhir::Contact],
-          address: Fhir::Address,
-          gender: Fhir::CodeableConcept
-        )],
-          active: Boolean
+          addresses: Array[Fhir::Address],
+          part_of: Fhir::Organization,
+          contacts: Array[Fhir::Organization::Contact.new(
+            purpose: Fhir::CodeableConcept,
+            name: Fhir::HumanName,
+            telecoms: Array[Fhir::Contact],
+            address: Fhir::Address,
+            gender: Fhir::CodeableConcept
+          )],
+            active: Boolean
       )
     end
 
     def discharge_disposition_to_code(discharge_disposition, terrminology)
       # !!! Add mappings !!! Incomplete
       terrminology.map_concept(
-          'http://hl7.org/fhir/v2/vs/0112',
-          discharge_disposition,
-          'http://hl7.org/fhir/vs/encounter-discharge-disposition'
+        'http://hl7.org/fhir/v2/vs/0112',
+        discharge_disposition,
+        'http://hl7.org/fhir/vs/encounter-discharge-disposition'
       )[:code]
     end
 
@@ -275,9 +261,9 @@ end
     def admit_source_to_code(admit_source, terrminology)
       #!!! Incomplete
       terrminology.map_concept(
-          'http://hl7.org/fhir/v2/vs/0023',
-          admit_source,
-          'http://hl7.org/fhir/vs/encounter-admit-source'
+        'http://hl7.org/fhir/v2/vs/0023',
+        admit_source,
+        'http://hl7.org/fhir/vs/encounter-admit-source'
       )[:code]
     end
   end
