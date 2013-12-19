@@ -171,15 +171,20 @@ module FhirHl7Converter
     def fhir_location(hl7, terrminology)
       #TODO: process previous location and previous temporary location?
       location = hl7.pv1.assigned_patient_location || hl7.pv1.temporary_location
+      name = {}
+      %w(facility point_of_care room bed).each do |name_part|
+        name[name_part] = location.name_part.to_p if location.name_part
+      end
+
       Fhir::Location.new(
           text:                  'TODO',
-          name:                  'TODO',
-          description:           location.description,
+          name:                  name.flatten.join(' '),
+          description:           location.description.to_p,
           types:                 'TODO',
-          telecom:               'TODO',
-          address:               'TODO',
-          position:              'TODO',
-          managing_organization: 'TODO',
+          telecom:               nil,
+          address:               nil,
+          position:              nil,
+          managing_organization: nil,
           status:                'TODO',
           part_of:               'TODO',
           mode:                  'TODO'
