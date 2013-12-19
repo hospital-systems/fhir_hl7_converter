@@ -159,6 +159,9 @@ module FhirHl7Converter
     end
 
     def fhir_locations(hl7, terrminology)
+      #TODO: use EVN-2 for the start of the period or PV1-44 (admit date_time) + PV1-45 (discharge date_time) ?
+      #      mapping at http://hl7.org/implement/standards/fhir/encounter-mappings.html#http://hl7.org/v2
+      #      shows no way of mapping
       [Fhir::Encounter::Location.new(
         location: fhir_location(hl7, terrminology),
         period: Fhir::Period.new(start: DateTime.now, end: DateTime.now)
@@ -166,6 +169,21 @@ module FhirHl7Converter
     end
 
     def fhir_location(hl7, terrminology)
+      #TODO: process previous location and previous temporary location?
+      location = hl7.pv1.assigned_patient_location || hl7.pv1.temporary_location
+      Fhir::Location.new(
+          text:                  'TODO',
+          name:                  'TODO',
+          description:           location.description,
+          types:                 'TODO',
+          telecom:               'TODO',
+          address:               'TODO',
+          position:              'TODO',
+          managing_organization: 'TODO',
+          status:                'TODO',
+          part_of:               'TODO',
+          mode:                  'TODO'
+      )
       #Fhir::Location,PV1-3-assigned patient location / PV1-6-prior patient location / PV1-11-temporary location / PV1-42-pending location / PV1-43-prior temporary location
 =begin
 class Fhir::Location < Fhir::Resource
