@@ -82,7 +82,7 @@ module FhirHl7Converter
         special_courtesies: fhir_special_courtesies(hl7),
         special_arrangements: fhir_special_arrangements(hl7),
         destination: nil,#Fhir::Location,
-        discharge_disposition: pv1_to_discharge_disposition(hl7.pv1),
+        discharge_disposition: fhir_discharge_disposition(hl7),
         re_admission: fhir_re_admission(hl7)
       )
     end
@@ -140,15 +140,17 @@ module FhirHl7Converter
 
     def fhir_discharge_disposition(hl7)
       discharge_disposition = hl7.pv1.discharge_disposition.try(:to_p)
-      coding                = terrminology.coding(
-        'http://hl7.org/fhir/vs/encounter-discharge-disposition',
-        discharge_disposition_to_code(discharge_disposition, terrminology)
-      )
-      discharge_disposition && Fhir::CodeableConcept.new(
-        codings: [Fhir::Coding.new(coding)],
-        text:    coding[:display])
-
-        #Fhir::CodeableConcept,PV1-36-discharge disposition
+      if discharge_disposition
+        coding = Fhir::Coding.new(
+          system: 'http://hl7.org/fhir/v2/vs/0112',
+          code: discharge_disposition,
+          display: discharge_disposition
+        )
+        Fhir::CodeableConcept.new(
+          codings: [Fhir::Coding.new(coding)],
+          text: discharge_disposition
+        )
+      end
     end
 
     def fhir_re_admission(hl7)
@@ -240,15 +242,6 @@ end
           )],
             active: Boolean
       )
-    end
-
-    def discharge_disposition_to_code(discharge_disposition)
-      # !!! Add mappings !!! Incomplete
-      terrminology.map_concept(
-        'http://hl7.org/fhir/v2/vs/0112',
-        discharge_disposition,
-        'http://hl7.org/fhir/vs/encounter-discharge-disposition'
-      )[:code]
     end
 
     def vip_indicator_to_code(vip_indicator)
