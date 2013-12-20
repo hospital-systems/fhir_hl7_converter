@@ -41,9 +41,9 @@ module FhirHl7Converter
       )
     end
 
-    def xad_to_fhir_address(xad, terrminology)
+    def xad_to_fhir_address(xad)
       Fhir::Address.new(
-        use: address_type_to_use(xad.address_type.try(:to_p), terrminology),
+        use: address_type_to_use(xad.address_type.try(:to_p)),
         text: [
           xad.street_address.try(:street_or_mailing_address),
           xad.street_address.try(:street_name),
@@ -151,7 +151,7 @@ module FhirHl7Converter
 
     #temp mapping methods
 
-    def address_type_to_use(address_type, terrminology)
+    def address_type_to_use(address_type)
       terrminology.map_concept(
         'http://hl7.org/fhir/v2/vs/0190',
         address_type,
