@@ -75,7 +75,7 @@ module FhirHl7Converter
       Fhir::Encounter::Hospitalization.new(
         pre_admission_identifier: fhir_pre_admission_identifier(hl7),
         origin: nil,#Fhir::Location,
-        admit_source: pv1_to_admit_source(hl7.pv1),
+        admit_source: fhir_admit_source(hl7),
         period: hl7_to_fhir_period(hl7),
         accomodations: pv1_to_fhir_accomodations(hl7.pv1),
         diet: fhir_diet(hl7),
@@ -91,17 +91,19 @@ module FhirHl7Converter
       DataTypeConverter.cx_to_fhir_identifier(hl7.pv1.preadmit_number) if hl7.pv1.preadmit_number
     end
 
-    def pv1_to_admit_source(hl7)
-      #Fhir::CodeableConcept,PV1-14-admit source
+    def fhir_admit_source(hl7)
       admit_source = hl7.pv1.admit_source.try(:to_p)
-      coding       = terrminology.coding(
-        'http://hl7.org/fhir/vs/encounter-admit-source',
-        admit_source_to_code(admit_source)
-      )
-      admit_source && Fhir::CodeableConcept.new(
-        codings: [Fhir::Coding.new(coding)],
-        text:    coding[:display] || admit_source
-      )
+      if admit_source
+        coding = Fhir::Coding.new(
+          system: 'http://hl7.org/fhir/v2/vs/0023',
+          code: admit_source,
+          display: admit_source
+        )
+        Fhir::CodeableConcept.new(
+          codings: [Fhir::Coding.new(coding)],
+          text: admit_source
+        )
+      end
     end
 
     def fhir_period(hl7)
@@ -132,6 +134,15 @@ module FhirHl7Converter
       vip_indicator && Fhir::CodeableConcept.new(
         codings: [Fhir::Coding.new(coding)],
         text:    coding[:display])
+    end
+
+    def admit_source_to_code(admit_source)
+      #!!! Incomplete
+      terrminology.map_concept(
+        'http://hl7.org/fhir/v2/vs/0023',
+        admit_source,
+        'http://hl7.org/fhir/vs/encounter-admit-source'
+      )[:code]
     end
 
     def fhir_special_arrangements(hl7)
@@ -246,15 +257,6 @@ end
 
     def vip_indicator_to_code(vip_indicator)
       vip_indicator
-    end
-
-    def admit_source_to_code(admit_source)
-      #!!! Incomplete
-      terrminology.map_concept(
-        'http://hl7.org/fhir/v2/vs/0023',
-        admit_source,
-        'http://hl7.org/fhir/vs/encounter-admit-source'
-      )[:code]
     end
   end
 end
