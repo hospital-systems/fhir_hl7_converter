@@ -9,19 +9,17 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   let(:message)                              { fixture('adt_a01') }
   let(:hl7)                                  { HealthSeven::Message.parse(message) }
   let(:pv1)                                  { hl7.pv1 }
-  let(:gateway)                              { FhirHl7Converter::Factory.hl7_to_fhir(hl7) }
-  let(:terrminology)                         { gateway.terrminology }
   let(:discharge_disposition_v_s_identifier) { 'http://hl7.org/fhir/vs/encounter-discharge-disposition' }
   let(:admit_source_v_s_identifier)          { 'http://hl7.org/fhir/vs/encounter-admit-source' }
   let(:admission_type_v_s_identifier)        { 'http://hl7.org/fhir/v2/vs/0007' }
 
   example do
-    patient_class = subject.fhir_class(hl7, gateway.terrminology)
+    patient_class = subject.fhir_class(hl7)
     patient_class.should == pv1.patient_class.to_p
   end
 
   example do
-    types = subject.fhir_types(hl7, gateway.terrminology)
+    types = subject.fhir_types(hl7)
 
     coding = gateway.terrminology.coding(
       admission_type_v_s_identifier,
@@ -39,7 +37,7 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   end
 
   example do
-    identifiers = subject.fhir_identifiers(hl7, gateway.terrminology)
+    identifiers = subject.fhir_identifiers(hl7)
     identifiers.first.tap do |t|
       expect(t.key.should).to eq(pv1.visit_number.id_number.to_p)
       expect(t.label.should).to eq(pv1.visit_number.id_number.to_p)
@@ -48,7 +46,7 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   end
 
   example do
-    pre_admission_identifier = subject.fhir_pre_admission_identifier(hl7, gateway.terrminology)
+    pre_admission_identifier = subject.fhir_pre_admission_identifier(hl7)
     expect(pre_admission_identifier.key)
     .to eq(pv1.preadmit_number.id_number.to_p)
     expect(pre_admission_identifier.label)
@@ -58,14 +56,14 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   end
 
   example do
-    admit_source = subject.pv1_to_admit_source(hl7, gateway.terrminology)
+    admit_source = subject.pv1_to_admit_source(hl7)
     admit_source.first.tap do |t|
       fail 'need mapping'
     end
   end
 
   example do
-    subject.fhir_diet(hl7, gateway.terrminology).tap do |diet|
+    subject.fhir_diet(hl7).tap do |diet|
       expect(diet.text).to eq(pv1.diet_type.text.to_p)
       diet.codings.first.tap do |primary|
         expect(primary.system).to eq(pv1.diet_type.name_of_coding_system.to_p)
@@ -81,7 +79,7 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   end
 
   example do
-    subject.fhir_special_courtesies(hl7, gateway.terrminology).tap do |special_courtesies|
+    subject.fhir_special_courtesies(hl7).tap do |special_courtesies|
       expect(special_courtesies.text).to eq(pv1.vip_indicator.to_p)
       special_courtesies.codings.first.tap do |coding|
         expect(coding.code).to eq(pv1.vip_indicator.to_p)
@@ -91,12 +89,12 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   end
 
   example do
-    subject.fhir_discharge_disposition(hl7, gateway.terrminology).tap do |discharge_disposition|
+    subject.fhir_discharge_disposition(hl7).tap do |discharge_disposition|
       pv1_discharge_disposition = pv1.discharge_disposition.to_p
 
       external_coding = gateway.terrminology.coding(
         discharge_disposition_v_s_identifier,
-        subject.discharge_disposition_to_code(pv1_discharge_disposition, gateway.terrminology))
+        subject.discharge_disposition_to_code(pv1_discharge_disposition))
 
         expect(discharge_disposition.text).to eq(external_coding[:display])
 
@@ -109,12 +107,12 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   end
 
   example do
-    subject.pv1_to_admit_source(hl7, gateway.terrminology).tap do |admit_source|
+    subject.pv1_to_admit_source(hl7).tap do |admit_source|
       pv1_admit_source = pv1.admit_source.to_p
 
       external_coding = gateway.terrminology.coding(
         admit_source_v_s_identifier,
-        subject.admit_source_to_code(pv1_admit_source, gateway.terrminology)
+        subject.admit_source_to_code(pv1_admit_source)
       )
 
       expect(admit_source.text).to eq(external_coding[:display])
@@ -128,14 +126,14 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   end
 
   example do
-    subject.fhir_re_admission(hl7, gateway.terrminology).tap do |re_admission|
+    subject.fhir_re_admission(hl7).tap do |re_admission|
       expect(re_admission).to be_true
     end
   end
 
   example do
     pv1.assigned_patient_location.tap do |l|
-      subject.fhir_location(hl7, gateway.terrminology).tap do |bed|
+      subject.fhir_location(hl7).tap do |bed|
         bed.name.should == l.bed.to_p
         bed.description.should == l.bed.to_p
         #bed.mode.should == 'instance'
@@ -163,18 +161,18 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   end
 
   example do
-    subject.fhir_reason(hl7, terrminology).should == hl7.pv2.admit_reason.text.to_p
+    subject.fhir_reason(hl7).should == hl7.pv2.admit_reason.text.to_p
   end
 
   example do
     puts hl7.pv2.visit_priority_code.to_yaml
-    puts subject.fhir_priority(hl7, terrminology)
+    puts subject.fhir_priority(hl7)
   end
 
   describe '#fhir_period' do
     it 'should convert hl7 admit_date_time and discharge_date_time into fhir period' do
-      subject.fhir_period(hl7, terrminology).start.should == Time.parse(hl7.pv1.admit_date_time.time.to_p)
-      subject.fhir_period(hl7, terrminology).end.should   == (hl7.pv1.discharge_date_times.blank? ? nil : Time.parse(hl7.pv1.discharge_date_times.first.time.to_p))
+      subject.fhir_period(hl7).start.should == Time.parse(hl7.pv1.admit_date_time.time.to_p)
+      subject.fhir_period(hl7).end.should == (hl7.pv1.discharge_date_times.blank? ? nil : Time.parse(hl7.pv1.discharge_date_times.first.time.to_p))
     end
   end
 end
