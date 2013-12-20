@@ -22,15 +22,14 @@ module FhirHl7Converter
 
     def fhir_types(hl7)
       admission_type = hl7.pv1.admission_type.try(:to_p)
-      coding         = terrminology.coding(
-        'http://hl7.org/fhir/v2/vs/0007',
-        admission_type
-      )
-      admission_type && [
-        Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
-          text:    coding[:display] || admission_type
-        )]
+      if admission_type
+        coding = Fhir::Coding.new(
+          system: 'http://hl7.org/fhir/v2/vs/0007',
+          code: admission_type,
+          display: admission_type
+        )
+        [Fhir::CodeableConcept.new(codings: [Fhir::Coding.new(coding)], text: admission_type)]
+      end
     end
 
     def fhir_participants(hl7)
@@ -124,25 +123,18 @@ module FhirHl7Converter
     end
 
     def fhir_special_courtesies(hl7)
-      #Array[Fhir::CodeableConcept],PV1-16-VIP indicator
       vip_indicator = hl7.pv1.vip_indicator.try(:to_p)
-      code          = vip_indicator_to_code(vip_indicator)
-      coding        = terrminology.coding(
-        'http://hl7.org/fhir/vs/encounter-special-courtesy',
-        admit_source_to_code(code)
-      )
-      vip_indicator && Fhir::CodeableConcept.new(
-        codings: [Fhir::Coding.new(coding)],
-        text:    coding[:display])
-    end
-
-    def admit_source_to_code(admit_source)
-      #!!! Incomplete
-      terrminology.map_concept(
-        'http://hl7.org/fhir/v2/vs/0023',
-        admit_source,
-        'http://hl7.org/fhir/vs/encounter-admit-source'
-      )[:code]
+      if vip_indicator
+        coding = Fhir::Coding.new(
+          system: 'http://hl7.org/fhir/v2/vs/0023',
+          code: admit_source,
+          display: admit_source
+        )
+        Fhir::CodeableConcept.new(
+          codings: [Fhir::Coding.new(coding)],
+          text: admit_source
+        )
+      end
     end
 
     def fhir_special_arrangements(hl7)
@@ -253,10 +245,6 @@ end
           )],
             active: Boolean
       )
-    end
-
-    def vip_indicator_to_code(vip_indicator)
-      vip_indicator
     end
   end
 end
