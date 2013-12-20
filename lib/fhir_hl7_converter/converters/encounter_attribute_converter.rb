@@ -96,7 +96,7 @@ module FhirHl7Converter
       admit_source = hl7.pv1.admit_source.try(:to_p)
       coding       = terrminology.coding(
         'http://hl7.org/fhir/vs/encounter-admit-source',
-        admit_source_to_code(admit_source, terrminology)
+        admit_source_to_code(admit_source)
       )
       admit_source && Fhir::CodeableConcept.new(
         codings: [Fhir::Coding.new(coding)],
@@ -127,7 +127,7 @@ module FhirHl7Converter
       code          = vip_indicator_to_code(vip_indicator)
       coding        = terrminology.coding(
         'http://hl7.org/fhir/vs/encounter-special-courtesy',
-        admit_source_to_code(code, terrminology)
+        admit_source_to_code(code)
       )
       vip_indicator && Fhir::CodeableConcept.new(
         codings: [Fhir::Coding.new(coding)],
