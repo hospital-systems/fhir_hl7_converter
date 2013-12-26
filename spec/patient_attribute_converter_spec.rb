@@ -40,27 +40,27 @@ describe FhirHl7Converter::PatientAttributeConverter do
 
   describe '#fhir_deceased' do
     it 'should create death time from hl7 message' do
-      deceased = subject.fhir_deceased(hl7, gateway.terrminology)
+      deceased = subject.fhir_deceased(hl7)
       deceased.should == DateTime.parse(pid.patient_death_date_and_time.time.to_p)
     end
   end
 
   describe '#fhir_multiple_birth' do
     it 'should create order of multiple births from hl7 message' do
-      subject.fhir_multiple_birth(hl7, gateway.terrminology).should == pid.birth_order.to_p
+      subject.fhir_multiple_birth(hl7).should == pid.birth_order.to_p
     end
   end
 
   example do
     nk1s.first.tap do |nk1|
-      contact = subject.nk1_to_fhir_contact(nk1, gateway.terrminology)
-      contact.relationships.first.tap do |cc|
-        cc.codings.first.tap do |c|
+      contact = subject.nk1_to_fhir_contact(nk1)
+      contact.relationship.first.tap do |cc|
+        cc.coding.first.tap do |c|
           c.system.should == 'http://hl7.org/fhir/patient-contact-relationship'
           c.code.should == nk1.relationship.identifier.to_p
           c.display;
         end
-        cc.codings.last.tap do |c|
+        cc.coding.last.tap do |c|
           c.system.should == 'http://hl7.org/fhir/patient-contact-relationship'
           c.code.should == nk1.contact_role.identifier.to_p
           c.display;
@@ -68,16 +68,16 @@ describe FhirHl7Converter::PatientAttributeConverter do
       end
       nk1.names.first.tap do |xpn|
         contact.name.tap do |n|
-          n.families.first.should == xpn.family_name.surname.to_p
-          n.givens.first.should == [xpn.given_name, xpn.second_and_further_given_names_or_initials_thereof].map(&:to_p).join(', ')
-          n.prefixes.first.should == xpn.prefix.to_p
-          n.suffixes.first.should == xpn.suffix.to_p
-          n.text.should == (n.givens + n.families + n.prefixes + n.suffixes).join(' ')
+          n.family.first.should == xpn.family_name.surname.to_p
+          n.given.first.should == [xpn.given_name, xpn.second_and_further_given_names_or_initials_thereof].map(&:to_p).join(', ')
+          n.prefix.first.should == xpn.prefix.to_p
+          n.suffix.first.should == xpn.suffix.to_p
+          n.text.should == (n.given + n.family + n.prefix + n.suffix).join(' ')
           n.period.should be_nil
         end
       end
       nk1.phone_numbers.first.tap do |xtn|
-        contact.telecoms.first.tap do |c|
+        contact.telecom.first.tap do |c|
           c.system.should == 'http://hl7.org/fhir/contact-system'
           c.value.should == xtn.telephone_number.to_p
           c.use.should == 'home'
@@ -85,7 +85,7 @@ describe FhirHl7Converter::PatientAttributeConverter do
         end
       end
       nk1.business_phone_numbers.first.tap do |xtn|
-        contact.telecoms.last.tap do |c|
+        contact.telecom.last.tap do |c|
           c.system.should == 'http://hl7.org/fhir/contact-system'
           c.value.should == xtn.telephone_number.to_p
           c.use.should == 'work'
@@ -93,7 +93,7 @@ describe FhirHl7Converter::PatientAttributeConverter do
         end
       end
       nk1.addresses.first.tap do |xad|
-        assert_address(contact.address, xad, gateway.terrminology)
+        assert_address(contact.address, xad)
       end
       assert_gender(contact.gender, nk1.administrative_sex)
     end

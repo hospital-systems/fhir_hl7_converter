@@ -122,9 +122,9 @@ module FhirHl7Converter
 
     def nk1_to_fhir_contact(nk1)
       Fhir::Patient::Contact.new(
-          relationships: [
+          relationship: [
               Fhir::CodeableConcept.new(
-                  codings: [
+                  coding: [
                       Fhir::Coding.new(
                           system: 'http://hl7.org/fhir/patient-contact-relationship',
                           code: nk1.relationship.identifier.to_p,
@@ -140,7 +140,7 @@ module FhirHl7Converter
               )
           ],
           name: DataTypeConverter.xpn_to_fhir_name(nk1.names.first),
-          telecoms: (
+          telecom: (
           nk1.phone_numbers.map{ |xtn| DataTypeConverter.xtn_to_fhir_telecom(xtn, 'home') } +
               nk1.business_phone_numbers.map{ |xtn| DataTypeConverter.xtn_to_fhir_telecom(xtn, 'work') }
           ),
