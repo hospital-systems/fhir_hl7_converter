@@ -16,7 +16,7 @@ module HL7SpecHelper
         xad.zip_or_postal_code,
         xad.country
     ].map(&:to_p).join(' ')
-    address.lines.should == [
+    address.line.should == [
         xad.street_address.try(:street_or_mailing_address),
         xad.street_address.try(:street_name),
         xad.street_address.try(:dwelling_number),
