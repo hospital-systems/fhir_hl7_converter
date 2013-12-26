@@ -40,10 +40,7 @@ module FhirHl7Converter
 
     def fhir_marital_status(hl7)
       marital_status = hl7_to_pid(hl7).marital_status.try(:identifier).try(:to_p)
-      coding = terrminology.coding(
-          'http://hl7.org/fhir/vs/marital-status',
-          marital_status
-      )
+      coding = { system: 'http://hl7.org/fhir/v2/0002', code: marital_status, display: marital_status }
       marital_status && Fhir::CodeableConcept.new(
           codings: [Fhir::Coding.new(coding)],
           text:    coding[:display]
@@ -55,7 +52,7 @@ module FhirHl7Converter
     end
 
     def fhir_photos(hl7)
-      hl7_to_obxes(hl7).first.try(:observation_values)
+      hl7.obxes.first.try(:observation_values)
       Fhir::Attachment.new(
           content_type: 'TODO',
           language: 'TODO',
@@ -68,7 +65,7 @@ module FhirHl7Converter
     end
 
     def fhir_contacts(hl7)
-      hl7_to_nk1s(hl7).map{ |nk1| nk1_to_fhir_contact(nk1) }
+      hl7.nk1s.map{ |nk1| nk1_to_fhir_contact(nk1) }
     end
 
 
@@ -116,14 +113,6 @@ module FhirHl7Converter
 
     def hl7_to_pid(hl7)
       hl7.pid
-    end
-
-    def hl7_to_obxes(hl7)
-      hl7.obxes
-    end
-
-    def hl7_to_nk1s(hl7)
-      hl7.nk1s
     end
 
     def hl7_to_lans(hl7)
@@ -174,7 +163,7 @@ module FhirHl7Converter
     end
 
     def lan_to_fhir_communication(lan)
-      lan.language_code
+      #lan.language_code
       Fhir::CodeableConcept.new(
           codings: [Fhir::Coding.new(
                         system: 'TODO',
@@ -186,11 +175,8 @@ module FhirHl7Converter
     end
 
     def administrative_sex_to_gender(administrative_sex)
-      sex    = administrative_sex.try(:to_p)
-      coding = terrminology.coding(
-          'http://hl7.org/fhir/vs/administrative-gender',
-          sex
-      )
+      sex = administrative_sex.try(:to_p)
+      coding = { system: 'http://hl7.org/fhir/v2/vs/0001', code: sex, display: sex }
       sex && Fhir::CodeableConcept.new(
           codings: [Fhir::Coding.new(coding)],
           text:    coding[:display] || sex
