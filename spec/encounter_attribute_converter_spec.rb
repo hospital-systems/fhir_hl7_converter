@@ -18,59 +18,59 @@ describe FhirHl7Converter::EncounterAttributeConverter do
     patient_class.should == pv1.patient_class.to_p
   end
 
-  example do
-    types = subject.fhir_types(hl7)
+  describe '#fhir_types' do
+    it 'should create codeable concept containing admission_type from hl7 message' do
+      types = subject.fhir_types(hl7)
 
-    coding = gateway.terrminology.coding(
-      admission_type_v_s_identifier,
-      pv1.admission_type.to_p
-    )
-
-    types.first.tap do |t|
-      t.text.should == coding[:display]
-      t.codings.first.tap do |c|
-        c.system.should  == coding[:system]
-        c.code.should    == coding[:code]
-        c.display.should == coding[:display]
+      types.first.tap do |t|
+        t.text.should == hl7.pv1.admission_type.try(:to_p)
+        t.coding.first.tap do |c|
+          c.system.should  == admission_type_v_s_identifier
+          c.code.should    == hl7.pv1.admission_type.try(:to_p)
+          c.display.should == hl7.pv1.admission_type.try(:to_p)
+        end
       end
     end
   end
 
-  example do
-    identifiers = subject.fhir_identifiers(hl7)
-    identifiers.first.tap do |t|
-      expect(t.key.should).to eq(pv1.visit_number.id_number.to_p)
-      expect(t.label.should).to eq(pv1.visit_number.id_number.to_p)
-      expect(t.system.should).to eq(pv1.visit_number.identifier_type_code.to_p)
+  describe '#fhir_identifiers' do
+    it 'should create fhir identifier from hl7 pv1 visit_number' do
+      identifiers = subject.fhir_identifiers(hl7)
+      identifiers.first.tap do |t|
+        expect(t.value).to  eq(hl7.pv1.visit_number.id_number.to_p)
+        expect(t.label).to  eq(hl7.pv1.visit_number.id_number.to_p)
+        expect(t.system).to eq(hl7.pv1.visit_number.identifier_type_code.to_p)
+      end
     end
   end
 
-  example do
-    pre_admission_identifier = subject.fhir_pre_admission_identifier(hl7)
-    expect(pre_admission_identifier.key)
-    .to eq(pv1.preadmit_number.id_number.to_p)
-    expect(pre_admission_identifier.label)
-    .to eq(pv1.preadmit_number.id_number.to_p)
-    expect(pre_admission_identifier.system)
-    .to eq(pv1.preadmit_number.identifier_type_code.to_p)
+  describe '#fhir_pre_admission_identifier' do
+    it 'should create fhir identifier from hl7 pv1 preadmit_number' do
+      pre_admission_identifier = subject.fhir_pre_admission_identifier(hl7)
+      expect(pre_admission_identifier.value).to    eq(hl7.pv1.preadmit_number.id_number.to_p)
+      expect(pre_admission_identifier.label).to  eq(hl7.pv1.preadmit_number.id_number.to_p)
+      expect(pre_admission_identifier.system).to eq(hl7.pv1.preadmit_number.identifier_type_code.to_p)
+    end
   end
 
-  example do
-    admit_source = subject.pv1_to_admit_source(hl7)
-    admit_source.first.tap do |t|
-      fail 'need mapping'
+  describe '#fhir_admit_source' do
+    it 'should create codeable concept containing admit_source from hl7 message' do
+      admit_source = subject.fhir_admit_source(hl7)
+      admit_source.tap do |t|
+        fail 'need mapping'
+      end
     end
   end
 
   example do
     subject.fhir_diet(hl7).tap do |diet|
       expect(diet.text).to eq(pv1.diet_type.text.to_p)
-      diet.codings.first.tap do |primary|
+      diet.coding.first.tap do |primary|
         expect(primary.system).to eq(pv1.diet_type.name_of_coding_system.to_p)
         expect(primary.code).to eq(pv1.diet_type.identifier.to_p)
         expect(primary.display).to eq(pv1.diet_type.text.to_p)
       end
-      diet.codings.second.tap do |primary|
+      diet.coding.second.tap do |primary|
         expect(primary.system).to eq(pv1.diet_type.name_of_alternate_coding_system.to_p)
         expect(primary.code).to eq(pv1.diet_type.alternate_identifier.to_p)
         expect(primary.display).to eq(pv1.diet_type.alternate_text.to_p)
@@ -81,7 +81,7 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   example do
     subject.fhir_special_courtesies(hl7).tap do |special_courtesies|
       expect(special_courtesies.text).to eq(pv1.vip_indicator.to_p)
-      special_courtesies.codings.first.tap do |coding|
+      special_courtesies.coding.first.tap do |coding|
         expect(coding.code).to eq(pv1.vip_indicator.to_p)
         expect(coding.display).to eq(pv1.vip_indicator.to_p)
       end
@@ -94,20 +94,21 @@ describe FhirHl7Converter::EncounterAttributeConverter do
 
       external_coding = gateway.terrminology.coding(
         discharge_disposition_v_s_identifier,
-        subject.discharge_disposition_to_code(pv1_discharge_disposition))
+        subject.discharge_disposition_to_code(pv1_discharge_disposition)
+      )
 
-        expect(discharge_disposition.text).to eq(external_coding[:display])
+      expect(discharge_disposition.text).to eq(external_coding[:display])
 
-        coding = discharge_disposition.codings.first
-        expect(coding.system).to eq(external_coding[:system])
-        expect(coding.code).to   eq(external_coding[:code])
+      coding = discharge_disposition.codings.first
+      expect(coding.system).to eq(external_coding[:system])
+      expect(coding.code).to   eq(external_coding[:code])
 
-        expect(coding.display).to eq(external_coding[:display])
+      expect(coding.display).to eq(external_coding[:display])
     end
   end
 
   example do
-    subject.pv1_to_admit_source(hl7).tap do |admit_source|
+    subject.fhir_admit_source(hl7).tap do |admit_source|
       pv1_admit_source = pv1.admit_source.to_p
 
       external_coding = gateway.terrminology.coding(
