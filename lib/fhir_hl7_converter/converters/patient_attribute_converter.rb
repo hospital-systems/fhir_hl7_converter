@@ -41,10 +41,7 @@ module FhirHl7Converter
     def fhir_marital_status(hl7)
       marital_status = hl7_to_pid(hl7).marital_status.try(:identifier).try(:to_p)
       coding = { system: 'http://hl7.org/fhir/v2/0002', code: marital_status, display: marital_status }
-      marital_status && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
-          text:    coding[:display]
-      )
+      marital_status && Fhir::CodeableConcept.new(coding: [Fhir::Coding.new(coding)], text: coding[:display])
     end
 
     def fhir_multiple_birth(hl7)
@@ -178,7 +175,7 @@ module FhirHl7Converter
       sex = administrative_sex.try(:to_p)
       coding = { system: 'http://hl7.org/fhir/v2/vs/0001', code: sex, display: sex }
       sex && Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
+          coding: [Fhir::Coding.new(coding)],
           text:    coding[:display] || sex
       )
     end

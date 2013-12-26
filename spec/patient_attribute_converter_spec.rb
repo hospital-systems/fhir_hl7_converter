@@ -14,37 +14,27 @@ describe FhirHl7Converter::PatientAttributeConverter do
   let(:administrative_sex_v_s_identifier)    { 'http://hl7.org/fhir/vs/administrative-gender' }
   let(:marital_status_code_v_s_identifier)   { 'http://hl7.org/fhir/vs/marital-status' }
 
-  before(:all) do
-    #gateway = FhirHl7Converter::Factory.hl7_to_fhir(HealthSeven::Message.parse(fixture('adt_a01')))
-    #gateway.terrminology.initialize_data
-  end
-
   describe '#fhir_gender' do
     it 'should create codeable concept containing gender from hl7 message' do
-      gender = subject.fhir_gender(hl7, gateway.terrminology)
+      gender = subject.fhir_gender(hl7)
       assert_gender(gender, pid.administrative_sex)
     end
   end
 
   describe '#fhir_birth_date' do
     it 'should create birth date_time from hl7 message' do
-      birth_date = subject.fhir_birth_date(hl7, gateway.terrminology)
+      birth_date = subject.fhir_birth_date(hl7)
       birth_date.should == DateTime.parse(pid.date_time_of_birth.time.to_p)
     end
   end
 
   describe '#fhir_marital_status' do
     it 'should create codeable concept containing marital status from hl7 message' do
-      coding = gateway.terrminology.coding(
-        marital_status_code_v_s_identifier,
-        pid.marital_status.identifier.to_p
-      )
+      marital_status = subject.fhir_marital_status(hl7)
 
-      marital_status = subject.fhir_marital_status(hl7, gateway.terrminology)
-
-      marital_status.codings.first.code.should    == coding[:code]
-      marital_status.codings.first.display.should == coding[:display]
-      marital_status.text.should                  == coding[:display]
+      marital_status.coding.first.code.should    == pid.marital_status.identifier.to_p
+      marital_status.coding.first.display.should == pid.marital_status.identifier.to_p
+      marital_status.text.should                  == pid.marital_status.identifier.to_p
     end
   end
 
@@ -142,12 +132,9 @@ Organization
   end
 
   def assert_gender(gender, administrative_sex)
-    coding = gateway.terrminology.coding(
-      administrative_sex_v_s_identifier,
-      administrative_sex.to_p)
-      gender.codings.first.tap do |c|
-        c.code.should    == coding[:code]
-        c.display.should == coding[:display]
-      end
+    gender.coding.first.tap do |c|
+      c.code.should == administrative_sex.to_p
+      c.display.should == administrative_sex.to_p
+    end
   end
 end
