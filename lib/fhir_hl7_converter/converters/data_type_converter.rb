@@ -70,10 +70,10 @@ module FhirHl7Converter
       suffixes = xcn.suffix.try(:to_p)
       Fhir::Practitioner.new(
         text: Fhir::Narrative.new(status: 'TODO', div: 'TODO'),
-        identifiers: [
+        identifier: [
           Fhir::Identifier.new(
             use: 'usual',
-            key: xcn.id_number.to_p,
+            value: xcn.id_number.to_p,
             label: xcn.id_number.to_p,
             system: nil,
             period: nil,
@@ -82,23 +82,23 @@ module FhirHl7Converter
             name: Fhir::HumanName.new(
               use: xcn.name_type_code.to_p,
               text: [givens, families, prefixes, suffixes].join(' '),#FIXME
-              families: [families],
-              givens: [givens],
-              prefixes: [prefixes],
-              suffixes: [suffixes],
+              family: [families],
+              given: [givens],
+              prefix: [prefixes],
+              suffix: [suffixes],
               period: nil#Fhir::Period.new(start: DateTime.now, end: DateTime.now)
           ),
-            telecoms: nil,#Array[Fhir::Contact],
+            telecom: nil,#Array[Fhir::Contact],
             address: nil,#Fhir::Address,
             gender: nil,#Fhir::CodeableConcept,
             birth_date: nil,#DateTime,
-            photos: nil,#Array[Fhir::Attachment],
+            photo: nil,#Array[Fhir::Attachment],
             organization: nil,#[Fhir::Organization],
-            roles: nil,#Array[Fhir::CodeableConcept],
-            specialties: nil,#Array[Fhir::CodeableConcept],
+            role: nil,#Array[Fhir::CodeableConcept],
+            specialty: nil,#Array[Fhir::CodeableConcept],
             period: nil,#Fhir::Period,
-            qualifications: xcn_to_fhir_practitioner_qualifications(xcn),
-            communications: nil#Array[Fhir::CodeableConcept]
+            qualification: xcn_to_fhir_practitioner_qualifications(xcn),
+            communication: nil#Array[Fhir::CodeableConcept]
       )
     end
 
@@ -108,7 +108,7 @@ module FhirHl7Converter
           Fhir::Practitioner::Qualification.new(
             code:
             Fhir::CodeableConcept.new(
-              codings: [Fhir::Coding.new(
+              coding: [Fhir::Coding.new(
                 system: 'TODO',
                 code: xcn.degree.to_p,
                 display: xcn.degree.to_p)],

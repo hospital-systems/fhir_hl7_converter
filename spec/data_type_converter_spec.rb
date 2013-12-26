@@ -70,16 +70,16 @@ describe FhirHl7Converter::DataTypeConverter do
       pv1.attending_doctors.first.tap do |xcn|
         subject.xcn_to_fhir_practitioner(xcn).tap do |p|
           #p.text.should# Fhir::Narrative
-          p.identifiers.first.key.should == xcn.id_number.to_p
+          p.identifier.first.value.should == xcn.id_number.to_p
           p.name.tap do |n|
-            n.families.first.should == xcn.family_name.surname.to_p
-            n.givens.first.should == xcn.given_name.to_p + ', ' + xcn.second_and_further_given_names_or_initials_thereof.to_p
-            n.suffixes.first.should == xcn.suffix.to_p
-            n.prefixes.first.should == xcn.prefix.to_p
+            n.family.first.should == xcn.family_name.surname.to_p
+            n.given.first.should == xcn.given_name.to_p + ', ' + xcn.second_and_further_given_names_or_initials_thereof.to_p
+            n.suffix.first.should == xcn.suffix.to_p
+            n.prefix.first.should == xcn.prefix.to_p
             n.use.should == xcn.name_type_code.to_p
           end
-          p.qualifications.first.tap do |q|
-            q.code.codings.first.code.should == xcn.degree.to_p
+          p.qualification.first.tap do |q|
+            q.code.coding.first.code.should == xcn.degree.to_p
             #q.period.should#, Fhir::Period
             #q.issuer.should# [Fhir::Organization]
           end
@@ -89,12 +89,12 @@ describe FhirHl7Converter::DataTypeConverter do
           p.address.should#, Fhir::Address
           p.gender.should#, Fhir::CodeableConcept
           p.birth_date.should#, DateTime
-          p.photos.should#, Array[Fhir::Attachment]
+          p.photo.should#, Array[Fhir::Attachment]
           p.organization.should#, [Fhir::Organization]
-          p.roles.should#, Array[Fhir::CodeableConcept]
-          p.specialties.should#, Array[Fhir::CodeableConcept]
+          p.role.should#, Array[Fhir::CodeableConcept]
+          p.specialty.should#, Array[Fhir::CodeableConcept]
           p.period.should#, Fhir::Period
-          p.communications.should#, Array[Fhir::CodeableConcept]
+          p.communication.should#, Array[Fhir::CodeableConcept]
         end
 =begin
 class Xcn < ::HealthSeven::DataType
