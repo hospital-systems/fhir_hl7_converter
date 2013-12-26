@@ -71,7 +71,7 @@ module FhirHl7Converter
       hl7_to_pid(hl7).strain
       Fhir::Patient::Animal.new(
           species: Fhir::CodeableConcept.new(
-              codings: [Fhir::Coding.new(
+              coding: [Fhir::Coding.new(
                             system: 'TODO',
                             code: 'TODO',
                             display: 'TODO'
@@ -79,7 +79,7 @@ module FhirHl7Converter
               text: 'TODO'
           ),
           breed: Fhir::CodeableConcept.new(
-              codings: [Fhir::Coding.new(
+              coding: [Fhir::Coding.new(
                             system: 'TODO',
                             code: 'TODO',
                             display: 'TODO'
@@ -87,7 +87,7 @@ module FhirHl7Converter
               text: 'TODO'
           ),
           gender_status: Fhir::CodeableConcept.new(
-              codings: [Fhir::Coding.new(
+              coding: [Fhir::Coding.new(
                             system: 'TODO',
                             code: 'TODO',
                             display: 'TODO'

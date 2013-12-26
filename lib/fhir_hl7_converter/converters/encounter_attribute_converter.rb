@@ -13,6 +13,7 @@ module FhirHl7Converter
 
     def fhir_status(hl7)
       #Fhir::Code,No clear equivalent in V2.x; active/finished could be inferred from PV1-44, PV1-45, PV2-24; inactive could be inferred from PV2-16
+      'TODO'
     end
 
     def fhir_class(hl7)
@@ -28,23 +29,24 @@ module FhirHl7Converter
           code: admission_type,
           display: admission_type
         )
-        [Fhir::CodeableConcept.new(codings: [Fhir::Coding.new(coding)], text: admission_type)]
+        [Fhir::CodeableConcept.new(coding: [Fhir::Coding.new(coding)], text: admission_type)]
       end
     end
 
     def fhir_participants(hl7)
       pv1 = hl7.pv1
-      pv1.attending_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'attending') } +
-        pv1.referring_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'referrer') } +
-        pv1.consulting_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'consulting') } +
-        pv1.admitting_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'admitter') }
+      pv1.attending_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'ATND', 'attender') } +
+        pv1.referring_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'REF', 'referrer') } +
+        pv1.consulting_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'CON', 'consultant') } +
+        pv1.admitting_doctors.map{ |xcn| xcn_to_fhir_participant(xcn, 'ADM', 'admitter') }
     end
 
 
-    def xcn_to_fhir_participant(xcn, code)
+    def xcn_to_fhir_participant(xcn, code, display)
+      coding = { system: 'http://hl7.org/fhir/participant-type', code: code, display: display }
       Fhir::Encounter::Participant.new(
-        types: [code],
-        practitioner: DataTypeConverter.xcn_to_fhir_practitioner(xcn)
+        type: [Fhir::CodeableConcept.new(coding: [Fhir::Coding.new(coding)], text: display)],
+        individual: DataTypeConverter.xcn_to_fhir_practitioner(xcn)
       )
     end
 
@@ -61,7 +63,12 @@ module FhirHl7Converter
     def fhir_reason(hl7)
       #hl7.evn.event_reason_code.to_yaml
       #hl7.pv2.admit_reason.text.to_p
-      hl7.try(:pv2).try(:admit_reason).try(:text).try(:to_p) # may be fully encoded with some terminology
+      reason = hl7.try(:pv2).try(:admit_reason).try(:text).try(:to_p) # may be fully encoded with some terminology
+      coding = { system: 'SUPER_REASON', code: reason, display: reason }
+      Fhir::CodeableConcept.new(
+        coding: [Fhir::Coding.new(coding)],
+        text: reason
+      )
     end
 
     def fhir_priority(hl7)
@@ -75,11 +82,11 @@ module FhirHl7Converter
         pre_admission_identifier: fhir_pre_admission_identifier(hl7),
         origin: nil,#Fhir::Location,
         admit_source: fhir_admit_source(hl7),
-        period: hl7_to_fhir_period(hl7),
-        accomodations: pv1_to_fhir_accomodations(hl7.pv1),
+        period: fhir_period(hl7),
+        accomodation: fhir_accomodations(hl7.pv1),
         diet: fhir_diet(hl7),
-        special_courtesies: fhir_special_courtesies(hl7),
-        special_arrangements: fhir_special_arrangements(hl7),
+        special_courtesy: fhir_special_courtesies(hl7),
+        special_arrangement: fhir_special_arrangements(hl7),
         destination: nil,#Fhir::Location,
         discharge_disposition: fhir_discharge_disposition(hl7),
         re_admission: fhir_re_admission(hl7)
@@ -99,7 +106,7 @@ module FhirHl7Converter
           display: admit_source
         )
         Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
+          coding: [Fhir::Coding.new(coding)],
           text: admit_source
         )
       end
@@ -127,12 +134,12 @@ module FhirHl7Converter
       if vip_indicator
         coding = Fhir::Coding.new(
           system: 'http://hl7.org/fhir/v2/vs/0023',
-          code: admit_source,
-          display: admit_source
+          code: vip_indicator,
+          display: vip_indicator
         )
         Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
-          text: admit_source
+          coding: [Fhir::Coding.new(coding)],
+          text: vip_indicator
         )
       end
     end
@@ -150,7 +157,7 @@ module FhirHl7Converter
           display: discharge_disposition
         )
         Fhir::CodeableConcept.new(
-          codings: [Fhir::Coding.new(coding)],
+          coding: [Fhir::Coding.new(coding)],
           text: discharge_disposition
         )
       end
@@ -224,7 +231,6 @@ class Xon < ::HealthSeven::DataType
   # Organization Identifier
   attribute :organization_identifier, St, position: "XON.10"
 end
-=end
       Fhir::Organization.new(
         text: Fhir::Narrative.new(
           status: 'TODO',
@@ -233,18 +239,20 @@ end
           identifiers: Array[Fhir::Identifier],
           name: 'TODO',
           type: Fhir::CodeableConcept,
-          telecoms: Array[Fhir::Contact],
-          addresses: Array[Fhir::Address],
+          telecom: Array[Fhir::Contact],
+          address: Array[Fhir::Address],
           part_of: Fhir::Organization,
-          contacts: Array[Fhir::Organization::Contact.new(
+          contact: Array[Fhir::Organization::Contact.new(
             purpose: Fhir::CodeableConcept,
             name: Fhir::HumanName,
-            telecoms: Array[Fhir::Contact],
+            telecom: Array[Fhir::Contact],
             address: Fhir::Address,
             gender: Fhir::CodeableConcept
           )],
             active: Boolean
       )
+=end
+      nil
     end
   end
 end
