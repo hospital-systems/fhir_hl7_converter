@@ -117,10 +117,10 @@ describe FhirHl7Converter::DataTypeConverter do
           p.period.should#, Fhir::Period
           p.communication.should#, Array[Fhir::CodeableConcept]
         end
-        puts xcn.source_table.to_yaml
-        puts xcn.identifier_check_digit.to_yaml
-        puts xcn.check_digit_scheme.to_yaml
-        puts xcn.name_context.to_yaml
+        #puts xcn.source_table.to_yaml
+        #puts xcn.identifier_check_digit.to_yaml
+        #puts xcn.check_digit_scheme.to_yaml
+        #puts xcn.name_context.to_yaml
       end
     end
   end
