@@ -70,18 +70,39 @@ describe FhirHl7Converter::DataTypeConverter do
       pv1.attending_doctors.first.tap do |xcn|
         subject.xcn_to_fhir_practitioner(xcn).tap do |p|
           #p.text.should# Fhir::Narrative
-          p.identifier.first.value.should == xcn.id_number.to_p
+          p.identifier.first.tap do |i|
+            i.value.should == xcn.id_number.to_p
+            #puts xcn.identifier_type_code.to_yaml
+            #13Identifier Type CodeableConceptPractitionerPractitioner.identifier.value
+            #puts xcn.effective_date.to_yaml
+            #puts xcn.expiration_date.to_yaml
+            i.period#
+            i.period#
+            #puts xcn.name_validity_range.to_yaml
+            #17PersonName Validity RangePractitioner.identifier.period
+            #puts xcn.assigning_facility.to_yaml
+            #14Assigning FacilityMaybe Practitioner.identifier.assigner
+          end
           p.name.tap do |n|
             n.family.first.should == xcn.family_name.surname.to_p
             n.given.first.should == xcn.given_name.to_p + ', ' + xcn.second_and_further_given_names_or_initials_thereof.to_p
             n.suffix.first.should == xcn.suffix.to_p
             n.prefix.first.should == xcn.prefix.to_p
             n.use.should == xcn.name_type_code.to_p
+            #puts xcn.name_assembly_order.to_yaml
+            #18Name Assembly OrderHelps to build Practitioner.name.text
+            #puts xcn.name_representation_code.to_yaml
+            #15Name Representation CodeableConceptPractitionerPractitionerHelps to build Practitioner.name.text
           end
           p.qualification.first.tap do |q|
             q.code.coding.first.code.should == xcn.degree.to_p
+            #q.code.coding.second.code.should == xcn.professional_suffix.to_p
             #q.period.should#, Fhir::Period
             #q.issuer.should# [Fhir::Organization]
+            #puts xcn.assigning_agency_or_department.to_yaml
+            #23Assigning Agency or DepartmentPractitioner.qualification.issuer
+            #puts xcn.assigning_jurisdiction.to_yaml
+            #22Assigning JurisdictionPractitioner.qualification.issuer
           end
           #9Assigning AuthorityPractitioner.identifier.system and/or Practitioner.name.assigner
           # Assigning Authority
@@ -96,53 +117,10 @@ describe FhirHl7Converter::DataTypeConverter do
           p.period.should#, Fhir::Period
           p.communication.should#, Array[Fhir::CodeableConcept]
         end
-=begin
-class Xcn < ::HealthSeven::DataType
-  # Source Table
-  attribute :source_table, Is, position: "XCN.8"
-  # Identifier Check Digit
-  attribute :identifier_check_digit, St, position: "XCN.11"
-  # Check Digit Scheme
-  attribute :check_digit_scheme, Id, position: "XCN.12"
-  # Identifier Type Code
-  attribute :identifier_type_code, Id, position: "XCN.13"
-  # Assigning Facility
-  attribute :assigning_facility, Hd, position: "XCN.14"
-  # Name Representation Code
-  attribute :name_representation_code, Id, position: "XCN.15"
-  # Name Context
-  attribute :name_context, Ce, position: "XCN.16"
-  # Name Validity Range
-  attribute :name_validity_range, Dr, position: "XCN.17"
-  # Name Assembly Order
-  attribute :name_assembly_order, Id, position: "XCN.18"
-  # Effective Date
-  attribute :effective_date, Ts, position: "XCN.19"
-  # Expiration Date
-  attribute :expiration_date, Ts, position: "XCN.20"
-  # Professional Suffix
-  attribute :professional_suffix, St, position: "XCN.21"
-  # Assigning Jurisdiction
-  attribute :assigning_jurisdiction, Cwe, position: "XCN.22"
-  # Assigning Agency or Department
-  attribute :assigning_agency_or_department, Cwe, position: "XCN.23"
-end
-1. XCN – this table summarises the mappings from XCN to practitioner:
-11Identifier Check DigitNo equivalent in FHIR (e.g. extension if really necessary)
-12Check Digit SchemeNo equivalent in FHIR (e.g. extension if really necessary)
-13Identifier Type CodeableConceptPractitionerPractitioner.identifier.value
-14Assigning FacilityMaybe Practitioner.identifier.assigner
-15Name Representation CodeableConceptPractitionerPractitionerHelps to build Practitioner.name.text
-17PersonName Validity RangePractitioner.identifier.period
-18Name Assembly OrderHelps to build Practitioner.name.text
-19Effective DateTimePractitioner.identifier.period
-20Expiration DateTimePractitionerPractitioner.identifier.period
-21Professional SuffixPractitioner.qualification.code
-22Assigning JurisdictionPractitioner.qualification.issuer
-23Assigning Agency or DepartmentPractitioner.qualification.issuer
-24Security CheckNo equivalent in FHIR (e.g. extension if really necessary)
-25Security Check SchemeNoNo equivalent in FHIR (e.g. extension if really necessary)
-=end
+        puts xcn.source_table.to_yaml
+        puts xcn.identifier_check_digit.to_yaml
+        puts xcn.check_digit_scheme.to_yaml
+        puts xcn.name_context.to_yaml
       end
     end
   end
