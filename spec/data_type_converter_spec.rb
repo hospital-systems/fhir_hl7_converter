@@ -5,12 +5,11 @@ require 'fhir_hl7_converter'
 describe FhirHl7Converter::DataTypeConverter do
   include HL7SpecHelper
 
-  let(:subject)      { FhirHl7Converter::DataTypeConverter}
+  let(:subject)      { FhirHl7Converter::DataTypeConverter }
   let(:message)      { fixture('adt_a01') }
   let(:hl7)          { HealthSeven::Message.parse(message) }
   let(:pid)          { hl7.pid }
   let(:pv1)          { hl7.pv1 }
-  let(:terrminology) { FhirHl7Converter::Factory.hl7_to_fhir(hl7).terrminology }
 
   describe '#xpn_to_fhir_name' do
     it 'should create fhir name from xpn segment' do
@@ -28,8 +27,8 @@ describe FhirHl7Converter::DataTypeConverter do
   describe '#xad_to_fhir_address' do
     it 'should create fhir address from xad segment' do
       pid.patient_addresses.first.tap do |xad|
-        address = subject.xad_to_fhir_address(xad, terrminology)
-        assert_address(address, xad, terrminology)
+        address = subject.xad_to_fhir_address(xad)
+        assert_address(address, xad)
       end
     end
   end
