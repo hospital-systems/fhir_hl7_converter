@@ -4,8 +4,8 @@ module HL7SpecHelper
     File.readlines(path).map(&:chomp).join("\r")
   end
 
-  def assert_address(address, xad, terrminology)
-    address.use.should == FhirHl7Converter::DataTypeConverter.address_type_to_use(xad.address_type.to_p, terrminology)
+  def assert_address(address, xad)
+    address.use.should == xad.address_type.to_p
     address.text.should == [
         xad.street_address.try(:street_or_mailing_address),
         xad.street_address.try(:street_name),
