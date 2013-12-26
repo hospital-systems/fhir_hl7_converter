@@ -6,16 +6,18 @@ module FhirHl7Converter
       primary_coding = Fhir::Coding.new(
         system: ce.name_of_coding_system.try(:to_p),
         code: ce.identifier.try(:to_p),
-        display: ce.text.try(:to_p))
+        display: ce.text.try(:to_p),
+        primary: true)
 
         if (alternate_identifier = ce.alternate_identifier)
           secondary_coding = Fhir::Coding.new(
             system: ce.name_of_alternate_coding_system.try(:to_p),
             code: alternate_identifier.to_p,
-            display: ce.alternate_text.try(:to_p))
+            display: ce.alternate_text.try(:to_p),
+            primary: false)
         end
         Fhir::CodeableConcept.new(
-          codings: [primary_coding, secondary_coding].compact,
+          coding: [primary_coding, secondary_coding].compact,
           text: primary_coding.display || secondary_coding.display
         )
     end

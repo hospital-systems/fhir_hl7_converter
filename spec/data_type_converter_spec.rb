@@ -12,6 +12,30 @@ describe FhirHl7Converter::DataTypeConverter do
   let(:pv1)          { hl7.pv1 }
 
   describe '#ce_to_codeable_concept' do
+    it 'should create fhir codable concept from ce hl7 data type' do
+      hl7.pv1.diet_type.tap do |ce|
+        subject.ce_to_codeable_concept(ce).tap do |cc|
+          cc.coding.count.should == 2
+          cc.coding.first.tap do |pc|
+            pc.system.should == ce.name_of_coding_system.to_p
+            pc.version.should be_nil
+            pc.code.should == ce.identifier.to_p
+            pc.display.should == ce.text.to_p
+            pc.primary.should be_true
+            pc.value_set.should be_nil
+          end
+          cc.coding.last.tap do |sc|
+            sc.system.should == ce.name_of_alternate_coding_system.to_p
+            sc.version.should be_nil
+            sc.code.should == ce.alternate_identifier.to_p
+            sc.display.should == ce.alternate_text.to_p
+            sc.primary.should be_false
+            sc.value_set.should be_nil
+          end
+          cc.text.should == ce.text.to_p
+        end
+      end
+    end
   end
 
   describe '#cx_to_fhir_identifier' do
@@ -59,8 +83,8 @@ describe FhirHl7Converter::DataTypeConverter do
             #q.period.should#, Fhir::Period
             #q.issuer.should# [Fhir::Organization]
           end
-#9Assigning AuthorityPractitioner.identifier.system and/or Practitioner.name.assigner
-  # Assigning Authority
+          #9Assigning AuthorityPractitioner.identifier.system and/or Practitioner.name.assigner
+          # Assigning Authority
           #puts xcn.assigning_authority.namespace_id.to_p
           p.address.should#, Fhir::Address
           p.gender.should#, Fhir::CodeableConcept
