@@ -47,7 +47,7 @@ describe FhirHl7Converter::EncounterAttributeConverter do
   describe '#fhir_pre_admission_identifier' do
     it 'should create fhir identifier from hl7 pv1 preadmit_number' do
       pre_admission_identifier = subject.fhir_pre_admission_identifier(hl7)
-      expect(pre_admission_identifier.value).to    eq(hl7.pv1.preadmit_number.id_number.to_p)
+      expect(pre_admission_identifier.value).to  eq(hl7.pv1.preadmit_number.id_number.to_p)
       expect(pre_admission_identifier.label).to  eq(hl7.pv1.preadmit_number.id_number.to_p)
       expect(pre_admission_identifier.system).to eq(hl7.pv1.preadmit_number.identifier_type_code.to_p)
     end
@@ -55,9 +55,11 @@ describe FhirHl7Converter::EncounterAttributeConverter do
 
   describe '#fhir_admit_source' do
     it 'should create codeable concept containing admit_source from hl7 message' do
-      admit_source = subject.fhir_admit_source(hl7)
-      admit_source.tap do |t|
-        fail 'need mapping'
+      subject.fhir_admit_source(hl7).tap do |admit_source|
+        expect(admit_source.text).to eq(hl7.pv1.admit_source.try(:to_p))
+        coding = admit_source.coding.first
+        expect(coding.code).to    eq(hl7.pv1.admit_source.try(:to_p))
+        expect(coding.display).to eq(hl7.pv1.admit_source.try(:to_p))
       end
     end
   end
