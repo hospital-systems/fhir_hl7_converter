@@ -88,41 +88,25 @@ describe FhirHl7Converter::EncounterAttributeConverter do
     end
   end
 
-  example do
-    subject.fhir_discharge_disposition(hl7).tap do |discharge_disposition|
-      pv1_discharge_disposition = pv1.discharge_disposition.to_p
-
-      external_coding = gateway.terrminology.coding(
-        discharge_disposition_v_s_identifier,
-        subject.discharge_disposition_to_code(pv1_discharge_disposition)
-      )
-
-      expect(discharge_disposition.text).to eq(external_coding[:display])
-
-      coding = discharge_disposition.codings.first
-      expect(coding.system).to eq(external_coding[:system])
-      expect(coding.code).to   eq(external_coding[:code])
-
-      expect(coding.display).to eq(external_coding[:display])
+  describe '#fhir_discharge_disposition' do
+    it 'should create codeable concept containing discharge_disposition from hl7 message' do
+      subject.fhir_discharge_disposition(hl7).tap do |discharge_disposition|
+        expect(discharge_disposition.text).to eq(hl7.pv1.discharge_disposition.try(:to_p))
+        coding = discharge_disposition.coding.first
+        expect(coding.code).to   eq(hl7.pv1.discharge_disposition.try(:to_p))
+        expect(coding.display).to eq(hl7.pv1.discharge_disposition.try(:to_p))
+      end
     end
   end
 
-  example do
-    subject.fhir_admit_source(hl7).tap do |admit_source|
-      pv1_admit_source = pv1.admit_source.to_p
-
-      external_coding = gateway.terrminology.coding(
-        admit_source_v_s_identifier,
-        subject.admit_source_to_code(pv1_admit_source)
-      )
-
-      expect(admit_source.text).to eq(external_coding[:display])
-
-      coding = admit_source.codings.first
-      expect(coding.system).to eq(external_coding[:system])
-      expect(coding.code).to   eq(external_coding[:code])
-
-      expect(coding.display).to eq(external_coding[:display])
+  describe '#fhir_admit_source' do
+    it 'should create codeable concept containing admit_source from hl7 message' do
+      subject.fhir_admit_source(hl7).tap do |admit_source|
+        expect(admit_source.text).to eq(hl7.pv1.admit_source.try(:to_p))
+        coding = admit_source.coding.first
+        expect(coding.code).to    eq(hl7.pv1.admit_source.try(:to_p))
+        expect(coding.display).to eq(hl7.pv1.admit_source.try(:to_p))
+      end
     end
   end
 
@@ -161,8 +145,10 @@ describe FhirHl7Converter::EncounterAttributeConverter do
     end
   end
 
-  example do
-    subject.fhir_reason(hl7).should == hl7.pv2.admit_reason.text.to_p
+  describe '#fhir_reason' do
+    it 'should create codeable concept containing reason from hl7 message' do
+      subject.fhir_reason(hl7).coding.first.code.should == hl7.pv2.admit_reason.text.to_p
+    end
   end
 
   example do
