@@ -132,11 +132,11 @@ describe FhirHl7Converter::DataTypeConverter do
     it 'should create fhir name from xpn segment' do
       pid.patient_names.first.tap do |xpn|
         name = subject.xpn_to_fhir_name(xpn)
-        name.families.first.should == xpn.family_name.surname.to_p
-        name.givens.first.should == [xpn.given_name, xpn.second_and_further_given_names_or_initials_thereof].map(&:to_p).join(', ')
-        name.prefixes.first.should == xpn.prefix.to_p
-        name.suffixes.first.should == xpn.suffix.to_p
-        name.text.should == (name.givens + name.families + name.prefixes + name.suffixes).join(' ')
+        name.family.first.should == xpn.family_name.surname.to_p
+        name.given.first.should == [xpn.given_name, xpn.second_and_further_given_names_or_initials_thereof].map(&:to_p).join(', ')
+        name.prefix.first.should == xpn.prefix.to_p
+        name.suffix.first.should == xpn.suffix.to_p
+        name.text.should == (name.given + name.family + name.prefix + name.suffix).join(' ')
       end
     end
   end

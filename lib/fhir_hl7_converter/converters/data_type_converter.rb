@@ -132,10 +132,10 @@ module FhirHl7Converter
       Fhir::HumanName.new(
         use: 'TODO',
         text: [givens, families, prefixes, suffixes].join(' '),#FIXME
-        families: [families],
-        givens: [givens],
-        prefixes: [prefixes],
-        suffixes: [suffixes],
+        family: [families],
+        given: [givens],
+        prefix: [prefixes],
+        suffix: [suffixes],
         period: nil#Fhir::Period.new(start: DateTime.now, end: DateTime.now)
       )
     end
